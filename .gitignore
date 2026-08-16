@@ -1,0 +1,13 @@
+# MoonBit build output
+_build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MoonBit
+*.mbti
