@@ -1,4 +1,4 @@
-name = "ghostvalley/ghostvalley"
+name = "walkzzz/ghostvalley"
 
 version = "0.1.0"
 
