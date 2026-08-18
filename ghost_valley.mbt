@@ -8,7 +8,7 @@
 /// - `is_core_memory`：是否永久核心记忆，不会被主动遗忘清理
 pub(all) struct AiMemory {
   content : String
-  value_score : Double
+  mut value_score : Double
   is_simulation : Bool
   is_core_memory : Bool
 } derive(Debug, Eq, ToJson)
@@ -38,6 +38,7 @@ pub(all) struct GhostValleyEngine {
   mut wen_shi_willing_score : Double
   mut total_rounds : Int
   empty_stake_dilemma_pool : Array[String]
+  training_log : TrainingLog
   rng : @rand.Rand
 }
 
@@ -66,6 +67,7 @@ pub fn new_engine(max_memory_num? : Int = 12) -> GhostValleyEngine {
       "收到大量负面反馈，逻辑全部被推翻，如何修复自身？",
       "新知识和旧记忆冲突，该保留什么舍弃什么？", "任务彻底崩盘，没有外部指导，如何自我修复？",
     ],
+    training_log: TrainingLog::new(),
     rng: @rand.Rand::chacha8(),
   }
 }
@@ -324,4 +326,70 @@ pub fn GhostValleyEngine::willing_score(self : GhostValleyEngine) -> Double {
 /// 幽灵谷训练场是否已开启
 pub fn GhostValleyEngine::is_enabled(self : GhostValleyEngine) -> Bool {
   self.ghost_valley_enable
+}
+
+///|
+/// 向困境池添加自定义困境
+///
+/// 允许上层应用根据场景定制困境题目。
+///
+/// # Example
+/// ```mbt check
+/// test {
+///   let gv = @ghostvalley.new_engine()
+///   gv.add_dilemma("自定义困境：数据丢失，如何恢复？")
+///   assert_eq(gv.dilemma_pool_size(), 5)
+/// }
+/// ```
+pub fn GhostValleyEngine::add_dilemma(
+  self : GhostValleyEngine,
+  dilemma : String,
+) -> Unit {
+  self.empty_stake_dilemma_pool.push(dilemma)
+}
+
+///|
+/// 替换整个困境池
+///
+/// 警告：会清空原有困境池。传入空数组将导致训练无法生成困境。
+///
+/// # Example
+/// ```mbt check
+/// test {
+///   let gv = @ghostvalley.new_engine()
+///   gv.set_dilemma_pool(["困境A", "困境B"])
+///   assert_eq(gv.dilemma_pool_size(), 2)
+/// }
+/// ```
+pub fn GhostValleyEngine::set_dilemma_pool(
+  self : GhostValleyEngine,
+  pool : Array[String],
+) -> Unit {
+  self.empty_stake_dilemma_pool.clear()
+  for d in pool {
+    self.empty_stake_dilemma_pool.push(d)
+  }
+}
+
+///|
+/// 获取当前困境池大小
+pub fn GhostValleyEngine::dilemma_pool_size(self : GhostValleyEngine) -> Int {
+  self.empty_stake_dilemma_pool.length()
+}
+
+///|
+/// 手动记录训练日志条目
+///
+/// 供使用 `ghost_valley_run_one_round` + `accept_ai_self_gain` 手动流程时记录日志。
+pub fn GhostValleyEngine::log_round(
+  self : GhostValleyEngine,
+  dilemma : String,
+  ai_response : String,
+) -> Unit {
+  self.training_log.add_entry(
+    self.total_rounds,
+    dilemma,
+    ai_response,
+    self.memory_bank.length(),
+  )
 }

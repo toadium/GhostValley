@@ -87,5 +87,11 @@ pub fn[T : LLMAdapter] GhostValleyEngine::run_round_with_llm(
   let ai_response = llm.generate_response(dilemma)
   self.accept_ai_self_gain(ai_response)
   self.total_rounds = self.total_rounds + 1
+  self.training_log.add_entry(
+    self.total_rounds,
+    dilemma,
+    ai_response,
+    self.memory_bank.length(),
+  )
   Some((dilemma, ai_response))
 }

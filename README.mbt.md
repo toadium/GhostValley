@@ -61,13 +61,13 @@ test {
 ///|
 pub struct AiMemory {
   content : String // 记忆内容
-  value_score : Double // 自打分 0~1
+  mut value_score : Double // 自打分 0~1（支持衰减修改）
   is_simulation : Bool // 安全气垫标记
   is_core_memory : Bool // 永久核心记忆
 }
 ```
 
-### GhostValleyEngine
+### GhostValleyEngine — 核心引擎
 
 | 方法 | 说明 |
 |------|------|
@@ -76,12 +76,100 @@ pub struct AiMemory {
 | `build_simulation_failure_case()` | 随机生成模拟困境 |
 | `add_memory(content, is_simulation~, is_core?)` | 添加记忆，自动触发遗忘 |
 | `ghost_valley_run_one_round()` | 一轮训练，返回困境或 None |
+| `ghost_valley_run_rounds(n)` | 多轮训练，返回困境数组 |
 | `accept_ai_self_gain(text)` | 接收 AI 自主顿悟的感悟 |
 | `close_ghost_valley()` | 关闭训练场 |
 | `show_all_memory()` | 格式化输出全部记忆 |
 | `memory_count()` | 当前记忆数量 |
 | `willing_score()` | 温石验证意愿分数 |
 | `is_enabled()` | 训练场是否已开启 |
+
+### GhostValleyEngine — 记忆检索
+
+| 方法 | 说明 |
+|------|------|
+| `search_memories(keyword)` | 按关键词检索记忆 |
+| `top_memories(n)` | 获取价值分最高的 N 条记忆 |
+| `filter_memories(is_simulation?, is_core?)` | 按标记过滤记忆 |
+| `average_value_score()` | 计算平均价值分 |
+| `real_memories()` | 获取所有真实记忆 |
+| `simulation_memories()` | 获取所有模拟记忆 |
+| `core_memories()` | 获取所有核心记忆 |
+
+### GhostValleyEngine — 记忆衰减
+
+| 方法 | 说明 |
+|------|------|
+| `apply_decay(rounds_elapsed)` | 对非核心记忆应用时间衰减 |
+| `cleanup_low_value(threshold)` | 清理低于阈值的非核心记忆，返回清理数 |
+| `min_value_score()` | 获取最低价值分 |
+| `max_value_score()` | 获取最高价值分 |
+
+### GhostValleyEngine — 训练日志
+
+| 方法 | 说明 |
+|------|------|
+| `get_training_log()` | 获取内置训练日志 |
+| `log_round(dilemma, response)` | 手动记录训练日志 |
+| `export_training_log_json()` | 导出日志为 JSON |
+| `export_training_log_string()` | 导出日志为 JSON 字符串 |
+| `export_training_log_format()` | 导出日志为格式化字符串 |
+
+### GhostValleyEngine — 困境池配置
+
+| 方法 | 说明 |
+|------|------|
+| `add_dilemma(dilemma)` | 添加自定义困境 |
+| `set_dilemma_pool(pool)` | 替换整个困境池 |
+| `dilemma_pool_size()` | 获取困境池大小 |
+
+### GhostValleyEngine — 持久化与报告
+
+| 方法 | 说明 |
+|------|------|
+| `save_memory()` / `save_memory_string()` | 序列化记忆库为 JSON |
+| `load_memory(json)` / `load_memory_string(str)` | 从 JSON 加载记忆 |
+| `training_report()` | 生成结构化训练报告 |
+| `training_report_json()` | 训练报告转 JSON 字符串 |
+
+### LLM 适配
+
+```moonbit nocheck
+///|
+pub trait LLMAdapter {
+  fn generate_response(Self, String) -> String
+}
+```
+
+| 方法 | 说明 |
+|------|------|
+| `MockLLM::new()` | 创建模拟 LLM 适配器 |
+| `run_round_with_llm(llm)` | 一轮训练 + LLM 自动响应 + 自动日志 |
+
+### TrainingLog / TrainingLogEntry
+
+```moonbit nocheck
+///|
+pub struct TrainingLogEntry {
+  round_num : Int
+  dilemma : String
+  ai_response : String
+  memory_count_after : Int
+}
+
+///|
+pub struct TrainingLog {
+  entries : Array[TrainingLogEntry]
+}
+```
+
+| 方法 | 说明 |
+|------|------|
+| `TrainingLog::new()` | 创建空日志 |
+| `TrainingLog::add_entry(...)` | 添加日志条目 |
+| `TrainingLog::length()` | 日志条目数量 |
+| `TrainingLog::to_json()` | 转 JSON 数组 |
+| `TrainingLog::format()` | 格式化输出 |
 
 ## 移植说明
 
@@ -94,8 +182,8 @@ pub struct AiMemory {
 | 原项目链接 | 由用户提供的概念性原型代码（未公开发布） |
 | 原项目许可证 | 由用户授权移植（概念性代码，无明确开源声明） |
 | 移植目标语言 | MoonBit |
-| 移植范围 | 五大模块全部移植：温石验证、防创伤安全气垫、主动式遗忘、第八根空桩、建造者退场 |
-| 移植状态 | 核心功能完整移植，21 个测试三后端全通过 |
+| 移植范围 | 五大模块全部移植 + 记忆检索/衰减/日志/配置化扩展 |
+| 移植状态 | 核心功能完整移植，110 个测试三后端全通过 |
 
 ### 移植修改说明
 
@@ -119,10 +207,18 @@ pub struct AiMemory {
 ```
 GhostValley/
 ├── moon.mod              # 模块定义
-├── moon.pkg              # 包配置（导入 @rand）
-├── ghost_valley.mbt      # 核心实现
-├── ghost_valley_test.mbt # 测试（21 个，三后端全通过）
+├── moon.pkg              # 包配置（导入 @rand @debug @json）
+├── ghost_valley.mbt      # 核心引擎 + 困境池配置
+├── embedding.mbt         # 语义打分 + 文本相似度
+├── llm_adapter.mbt       # LLM 接口 + MockLLM
+├── persistence.mbt       # 记忆持久化
+├── report.mbt            # 训练报告
+├── retrieval.mbt         # 记忆检索 API
+├── decay.mbt             # 记忆衰减机制
+├── training_log.mbt      # 训练日志系统
+├── *_test.mbt            # 测试文件（110 个，三后端全通过）
 ├── README.mbt.md         # 本文档
+├── CHANGELOG.md          # 变更日志
 ├── LICENSE               # Apache-2.0
 └── .github/workflows/ci.yml  # CI 配置
 ```
@@ -131,7 +227,7 @@ GhostValley/
 
 ```bash
 moon check --target all     # 类型检查（三后端）
-moon test --target all      # 运行测试（21 个，三后端全通过）
+moon test --target all      # 运行测试（110 个，三后端全通过）
 moon fmt                    # 格式化
 ```
 

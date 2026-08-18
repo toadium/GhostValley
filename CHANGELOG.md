@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.3.0] - 2026-08-18
+
+### Added
+- **记忆检索 API**：`search_memories`/`top_memories`/`filter_memories`/`average_value_score`
+- **记忆分类检索**：`real_memories`/`simulation_memories`/`core_memories` 便捷方法
+- **记忆衰减机制**：`apply_decay` 基于双曲衰减模型，高分记忆衰减更慢
+- **低价值清理**：`cleanup_low_value` 按阈值清理非核心记忆
+- **分数统计**：`min_value_score`/`max_value_score` 获取分数范围
+- **训练日志系统**：`TrainingLog`/`TrainingLogEntry` 结构化日志记录
+- **日志自动记录**：`run_round_with_llm` 自动记录每轮训练
+- **日志手动记录**：`log_round` 供手动流程记录
+- **日志导出**：`export_training_log_json`/`export_training_log_string`/`export_training_log_format`
+- **配置化困境池**：`add_dilemma`/`set_dilemma_pool`/`dilemma_pool_size` 动态管理困境
+
+### Changed
+- `AiMemory.value_score` 改为 `mut` 以支持衰减机制
+- `GhostValleyEngine` 新增 `training_log` 字段
+- `run_round_with_llm` 自动记录训练日志
+
+### Technical
+- 代码行数：~600 → ~850 行
+- 测试数量：55 → 110（三后端全通过）
+- 新增文件：retrieval/decay/training_log + 测试 + boundary_test
+- 公开 API：20+ → 40+
+
 ## [0.2.0] - 2026-08-18
 
 ### Added
