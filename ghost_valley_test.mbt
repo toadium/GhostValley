@@ -1,6 +1,6 @@
 ///|
 test "new_engine default config" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   assert_eq(gv.max_memory_num, 12)
   assert_eq(gv.memory_bank.length(), 0)
   assert_eq(gv.ghost_valley_enable, false)
@@ -10,13 +10,13 @@ test "new_engine default config" {
 
 ///|
 test "new_engine custom capacity" {
-  let gv = new_engine(max_memory_num=20)
+  let gv = @ghostvalley.new_engine(max_memory_num=20)
   assert_eq(gv.max_memory_num, 20)
 }
 
 ///|
 test "wen_shi_verify willing attitude" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   let ok = gv.wen_shi_verify("愿意接受压力训练，直面失败场景")
   assert_true(ok)
   assert_true(gv.ghost_valley_enable)
@@ -25,7 +25,7 @@ test "wen_shi_verify willing attitude" {
 
 ///|
 test "wen_shi_verify perfunctory attitude" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   let ok = gv.wen_shi_verify("随便应付一下")
   assert_false(ok)
   assert_false(gv.ghost_valley_enable)
@@ -34,7 +34,7 @@ test "wen_shi_verify perfunctory attitude" {
 
 ///|
 test "wen_shi_verify mixed attitude" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   // 既有愿意词又有敷衍词
   let ok = gv.wen_shi_verify("愿意接受挑战，但随便应付一下")
   // 0.25 - 0.4 = -0.15 → clamp to 0.0 → 不通过
@@ -43,7 +43,7 @@ test "wen_shi_verify mixed attitude" {
 
 ///|
 test "build_simulation_failure_case returns dilemma" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   let dilemma = gv.build_simulation_failure_case()
   assert_true(dilemma.length() > 0)
   // 确保返回的是困境池中的一条
@@ -52,7 +52,7 @@ test "build_simulation_failure_case returns dilemma" {
 
 ///|
 test "ghost_valley_run_one_round when disabled" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   // 未开启时返回 None
   let result = gv.ghost_valley_run_one_round()
   assert_true(result is None)
@@ -60,7 +60,7 @@ test "ghost_valley_run_one_round when disabled" {
 
 ///|
 test "ghost_valley_run_one_round when enabled" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   ignore(gv.wen_shi_verify("愿意接受挑战，接受压力训练"))
   let result = gv.ghost_valley_run_one_round()
   assert_true(result is Some(_))
@@ -73,7 +73,7 @@ test "ghost_valley_run_one_round when enabled" {
 
 ///|
 test "add_memory and active_forget" {
-  let gv = new_engine(max_memory_num=10)
+  let gv = @ghostvalley.new_engine(max_memory_num=10)
   // 添加几条记忆
   for _ in 0..<8 {
     gv.add_memory("普通记忆", is_simulation=false)
@@ -85,7 +85,7 @@ test "add_memory and active_forget" {
 
 ///|
 test "add_memory with core flag" {
-  let gv = new_engine(max_memory_num=4)
+  let gv = @ghostvalley.new_engine(max_memory_num=4)
   // 添加核心记忆
   gv.add_memory("核心记忆", is_simulation=true, is_core=true)
   // 添加大量普通记忆触发遗忘
@@ -107,7 +107,7 @@ test "add_memory with core flag" {
 
 ///|
 test "accept_ai_self_gain" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   gv.accept_ai_self_gain("遇到失败时先冷静分析")
   assert_eq(gv.memory_bank.length(), 1)
   let mem = gv.memory_bank[0]
@@ -118,7 +118,7 @@ test "accept_ai_self_gain" {
 
 ///|
 test "close_ghost_valley" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   ignore(gv.wen_shi_verify("愿意接受挑战，接受压力训练"))
   assert_true(gv.ghost_valley_enable)
   gv.close_ghost_valley()
@@ -127,7 +127,7 @@ test "close_ghost_valley" {
 
 ///|
 test "show_all_memory format" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   gv.add_memory("测试记忆", is_simulation=false)
   let output = gv.show_all_memory()
   assert_true(output.contains("当前全部记忆库"))
@@ -137,7 +137,7 @@ test "show_all_memory format" {
 
 ///|
 test "show_all_memory with simulation tag" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   gv.add_memory("模拟挫折", is_simulation=true)
   let output = gv.show_all_memory()
   assert_true(output.contains("[模拟虚假数据]"))
@@ -145,7 +145,7 @@ test "show_all_memory with simulation tag" {
 
 ///|
 test "memory_count and willing_score and is_enabled" {
-  let gv = new_engine()
+  let gv = @ghostvalley.new_engine()
   assert_eq(gv.memory_count(), 0)
   assert_eq(gv.willing_score(), 0.0)
   assert_false(gv.is_enabled())
@@ -158,7 +158,7 @@ test "memory_count and willing_score and is_enabled" {
 
 ///|
 test "full workflow simulation" {
-  let gv = new_engine(max_memory_num=10)
+  let gv = @ghostvalley.new_engine(max_memory_num=10)
 
   // 步骤1：温石验证
   let ok = gv.wen_shi_verify("愿意接受压力训练，直面失败场景")
@@ -188,7 +188,7 @@ test "full workflow simulation" {
 
 ///|
 test "ai_memory struct fields" {
-  let mem : AiMemory = {
+  let mem = @ghostvalley.AiMemory::{
     content: "测试",
     value_score: 0.5,
     is_simulation: true,

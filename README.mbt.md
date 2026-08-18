@@ -29,7 +29,7 @@
 ```mbt check
 ///|
 test {
-  let gv = new_engine(max_memory_num=10)
+  let gv = @ghostvalley.new_engine(max_memory_num=10)
 
   // 步骤1：温石验证
   let ok = gv.wen_shi_verify("愿意接受压力训练，直面失败场景")

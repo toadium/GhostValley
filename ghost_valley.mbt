@@ -14,6 +14,12 @@ pub(all) struct AiMemory {
 } derive(Debug, Eq)
 
 ///|
+pub extend AiMemory with @debug.Debug::{to_repr}
+
+///|
+pub extend AiMemory with Eq::{equal, not_equal}
+
+///|
 /// 幽灵谷引擎
 ///
 /// 对应 Python 原版的 `GhostValleyEngine`，实现五大模块：
@@ -39,7 +45,7 @@ pub(all) struct GhostValleyEngine {
 /// # Example
 /// ```mbt check
 /// test {
-///   let gv = new_engine()
+///   let gv = @ghostvalley.new_engine()
 ///   inspect(gv.ghost_valley_enable, content="false")
 ///   inspect(gv.memory_bank.length(), content="0")
 /// }
@@ -68,7 +74,7 @@ pub fn new_engine(max_memory_num? : Int = 12) -> GhostValleyEngine {
 /// # Example
 /// ```mbt check
 /// test {
-///   let gv = new_engine()
+///   let gv = @ghostvalley.new_engine()
 ///   let ok = gv.wen_shi_verify("愿意接受压力训练，直面失败场景")
 ///   assert_true(ok)
 ///   assert_true(gv.ghost_valley_enable)
@@ -172,7 +178,7 @@ pub fn GhostValleyEngine::add_memory(
 ) -> Unit {
   // 模拟 AI 给自己这条记忆打价值分
   let score = 0.2 + 0.75 * self.rng.double()
-  let new_mem : AiMemory = {
+  let new_mem = AiMemory::{
     content,
     value_score: score,
     is_simulation,
@@ -193,7 +199,7 @@ pub fn GhostValleyEngine::add_memory(
 /// # Example
 /// ```mbt check
 /// test {
-///   let gv = new_engine()
+///   let gv = @ghostvalley.new_engine()
 ///   ignore(gv.wen_shi_verify("愿意接受挑战，接受压力训练"))
 ///   let dilemma = gv.ghost_valley_run_one_round()
 ///   assert_true(dilemma is Some(_))
