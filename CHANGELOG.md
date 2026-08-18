@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.2.0] - 2026-08-18
+
+### Added
+- **Embedding 语义打分**：`text_value_score` 基于关键词匹配替代纯随机打分
+- **文本相似度**：`text_similarity` 基于关键词重叠率计算相似度
+- **LLM 接口抽象**：`trait LLMAdapter` + `MockLLM` 实现
+- **LLM 自动训练**：`run_round_with_llm` 一轮训练 + LLM 自动响应
+- **多轮训练 API**：`ghost_valley_run_rounds(n)` 批量训练
+- **记忆持久化**：`save_memory`/`load_memory` JSON 序列化
+- **训练报告**：`TrainingReport` 结构化报告 + JSON 导出
+- **训练轮次追踪**：`total_rounds` 字段
+
+### Changed
+- `add_memory` 用语义打分 + 随机扰动替代纯随机
+- `active_forget` 优化 O(n²) → O(n log n)
+- `AiMemory` 添加 `ToJson` derive
+- 警告治理 25→0（默认级别）
+
+### Technical
+- 代码行数：313 → ~600 行
+- 测试数量：21 → 55（三后端全通过）
+- 新增依赖：`moonbitlang/core/json`
+- 新增文件：embedding/llm_adapter/persistence/report + 测试
+
 ## [0.1.0] - 2026-08-18
 
 ### Added

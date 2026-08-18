@@ -1,4 +1,5 @@
 import {
   "moonbitlang/core/random" @rand,
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }

@@ -11,13 +11,16 @@ pub(all) struct AiMemory {
   value_score : Double
   is_simulation : Bool
   is_core_memory : Bool
-} derive(Debug, Eq)
+} derive(Debug, Eq, ToJson)
 
 ///|
 pub extend AiMemory with @debug.Debug::{to_repr}
 
 ///|
 pub extend AiMemory with Eq::{equal, not_equal}
+
+///|
+pub extend AiMemory with ToJson::{to_json}
 
 ///|
 /// 幽灵谷引擎
@@ -33,6 +36,7 @@ pub(all) struct GhostValleyEngine {
   memory_bank : Array[AiMemory]
   mut ghost_valley_enable : Bool
   mut wen_shi_willing_score : Double
+  mut total_rounds : Int
   empty_stake_dilemma_pool : Array[String]
   rng : @rand.Rand
 }
@@ -56,6 +60,7 @@ pub fn new_engine(max_memory_num? : Int = 12) -> GhostValleyEngine {
     memory_bank: [],
     ghost_valley_enable: false,
     wen_shi_willing_score: 0.0,
+    total_rounds: 0,
     empty_stake_dilemma_pool: [
       "任务执行全部失败，所有输出全部错误，该怎么调整？",
       "收到大量负面反馈，逻辑全部被推翻，如何修复自身？",
@@ -135,32 +140,26 @@ pub fn GhostValleyEngine::build_simulation_failure_case(
 pub fn GhostValleyEngine::active_forget(self : GhostValleyEngine) -> Unit {
   let bank = self.memory_bank
   if bank.length() <= self.max_memory_num / 2 {
-    return // 空间充足，不用清理
+    return
   }
-  // 筛选非核心记忆，按价值分升序排序
-  let non_core : Array[AiMemory] = []
-  for m in bank {
+  let non_core_indices : Array[(Int, Double)] = []
+  for i, m in bank {
     if !m.is_core_memory {
-      non_core.push(m)
+      non_core_indices.push((i, m.value_score))
     }
   }
-  // 按价值分排序（升序）
-  non_core.sort_by(fn(a, b) { a.value_score.compare(b.value_score) })
-  let remove_count = non_core.length() * 3 / 10 // 30%
+  non_core_indices.sort_by(fn(a, b) { a.1.compare(b.1) })
+  let remove_count = non_core_indices.length() * 3 / 10
+  let indices_to_remove : Array[Int] = []
   for i in 0..<remove_count {
-    if i < non_core.length() {
-      let bad_mem = non_core[i]
-      // 从 memory_bank 中移除
-      let mut found_idx = -1
-      for j in 0..<bank.length() {
-        if bank[j] == bad_mem {
-          found_idx = j
-          break
-        }
-      }
-      if found_idx >= 0 {
-        ignore(bank.remove(found_idx))
-      }
+    if i < non_core_indices.length() {
+      indices_to_remove.push(non_core_indices[i].0)
+    }
+  }
+  indices_to_remove.sort_by(fn(a, b) { b.compare(a) })
+  for idx in indices_to_remove {
+    if idx < bank.length() {
+      ignore(bank.remove(idx))
     }
   }
 }
@@ -169,18 +168,27 @@ pub fn GhostValleyEngine::active_forget(self : GhostValleyEngine) -> Unit {
 /// 写入记忆，写完自动触发主动遗忘机制
 ///
 /// 对应 Python 原版的 `add_memory`。
-/// 模拟 AI 给这条记忆打价值分（随机 0.2~0.95）。
+/// 价值分基于关键词语义打分（`text_value_score`）加小随机扰动，
+/// 替代原版纯随机打分，使高价值感悟更容易被保留。
 pub fn GhostValleyEngine::add_memory(
   self : GhostValleyEngine,
   content : String,
   is_simulation~ : Bool,
   is_core? : Bool = false,
 ) -> Unit {
-  // 模拟 AI 给自己这条记忆打价值分
-  let score = 0.2 + 0.75 * self.rng.double()
+  let base_score = text_value_score(content)
+  let noise = (self.rng.double() - 0.5) * 0.1
+  let score = base_score + noise
+  let final_score = if score < 0.05 {
+    0.05
+  } else if score > 0.95 {
+    0.95
+  } else {
+    score
+  }
   let new_mem = AiMemory::{
     content,
-    value_score: score,
+    value_score: final_score,
     is_simulation,
     is_core_memory: is_core,
   }
@@ -212,7 +220,41 @@ pub fn GhostValleyEngine::ghost_valley_run_one_round(
     return None
   }
   let dilemma = self.build_simulation_failure_case()
+  self.total_rounds = self.total_rounds + 1
   Some(dilemma)
+}
+
+///|
+/// 幽灵谷多轮训练
+///
+/// 批量执行 `n` 轮训练，返回每轮困境结果。
+/// 未开启时全部返回 `None`。
+///
+/// # Example
+/// ```mbt check
+/// test {
+///   let gv = @ghostvalley.new_engine()
+///   ignore(gv.wen_shi_verify("愿意接受挑战，接受压力训练"))
+///   let results = gv.ghost_valley_run_rounds(3)
+///   assert_eq(results.length(), 3)
+///   let mut all_some = true
+///   for r in results {
+///     if r is None {
+///       all_some = false
+///     }
+///   }
+///   assert_true(all_some)
+/// }
+/// ```
+pub fn GhostValleyEngine::ghost_valley_run_rounds(
+  self : GhostValleyEngine,
+  n : Int,
+) -> Array[String?] {
+  let results : Array[String?] = []
+  for _ in 0..<n {
+    results.push(self.ghost_valley_run_one_round())
+  }
+  results
 }
 
 ///|
