@@ -168,7 +168,9 @@ pub fn GhostValleyEngine::active_forget(self : GhostValleyEngine) -> Unit {
     }
   }
   non_core_indices.sort_by(fn(a, b) { a.1.compare(b.1) })
-  let remove_count = non_core_indices.length() * 3 / 10
+  let raw_count = non_core_indices.length() * 3 / 10
+  // 确保触发遗忘时至少删除 1 条非核心记忆
+  let remove_count = if raw_count >= 1 { raw_count } else { 1 }
   let indices_to_remove : Array[Int] = []
   for i in 0..<remove_count {
     if i < non_core_indices.length() {

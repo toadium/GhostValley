@@ -46,17 +46,41 @@ pub fn GhostValleyEngine::top_memories(
   self : GhostValleyEngine,
   n : Int,
 ) -> Array[AiMemory] {
-  let sorted : Array[AiMemory] = []
-  for m in self.memory_bank {
-    sorted.push(m)
+  let bank = self.memory_bank
+  if n <= 0 || bank.length() == 0 {
+    return []
   }
-  sorted.sort_by(fn(a, b) { b.value_score.compare(a.value_score) })
-  let count = if n < sorted.length() { n } else { sorted.length() }
-  let result : Array[AiMemory] = []
-  for i in 0..<count {
-    result.push(sorted[i])
+  // Partial selection: maintain top-n without full sort.
+  // O(n * k) where k = top_n, better than O(n log n) when n >> k.
+  let top : Array[AiMemory] = []
+  for m in bank {
+    if top.length() < n {
+      // Insert into sorted position
+      let mut inserted = false
+      for j in 0..<top.length() {
+        if m.value_score > top[j].value_score {
+          top.insert(j, m)
+          inserted = true
+          break
+        }
+      }
+      if not(inserted) {
+        top.push(m)
+      }
+    } else if m.value_score > top[top.length() - 1].value_score {
+      // Better than worst in top-n, replace and re-sort position
+      top[top.length() - 1] = m
+      // Bubble up to correct position
+      let mut i = top.length() - 1
+      while i > 0 && top[i].value_score > top[i - 1].value_score {
+        let tmp = top[i]
+        top[i] = top[i - 1]
+        top[i - 1] = tmp
+        i = i - 1
+      }
+    }
   }
-  result
+  top
 }
 
 ///|
