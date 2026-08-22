@@ -403,3 +403,117 @@ pub fn GhostValleyEngine::log_round(
     self.memory_bank.length(),
   )
 }
+
+///|
+/// 去重添加记忆
+///
+/// 添加前检查与现有记忆的 text_similarity，若超过阈值则合并
+/// （保留较高 value_score，拼接内容）而非重复添加。
+/// 返回 true 表示新建，false 表示合并到已有记忆。
+///
+/// # Example
+/// ```mbt check
+/// test {
+///   let gv = @ghostvalley.new_engine(max_memory_num=20)
+///   let created1 = gv.add_memory_dedup("顿悟反思改进", is_simulation=false)
+///   assert_true(created1)
+///   let created2 = gv.add_memory_dedup(
+///     "顿悟反思改进修复",
+///     is_simulation=false,
+///   )
+///   // 高相似度，应合并而非新建
+///   assert_false(created2)
+/// }
+/// ```
+pub fn GhostValleyEngine::add_memory_dedup(
+  self : GhostValleyEngine,
+  content : String,
+  is_simulation~ : Bool,
+  is_core? : Bool = false,
+  similarity_threshold? : Double = 0.8,
+) -> Bool {
+  let bank = self.memory_bank
+  // 查找最相似的已有记忆
+  let mut best_idx = -1
+  let mut best_sim = 0.0
+  for i, m in bank {
+    let sim = text_similarity(content, m.content)
+    if sim >= best_sim {
+      best_sim = sim
+      best_idx = i
+    }
+  }
+  if best_idx >= 0 && best_sim >= similarity_threshold {
+    // 合并：取较高分数，拼接内容
+    let existing = bank[best_idx]
+    let merged_score = if existing.value_score > text_value_score(content) {
+      existing.value_score
+    } else {
+      text_value_score(content)
+    }
+    let clamped = if merged_score < 0.05 {
+      0.05
+    } else if merged_score > 0.95 {
+      0.95
+    } else {
+      merged_score
+    }
+    bank[best_idx] = AiMemory::{
+      content: existing.content + " | " + content,
+      value_score: clamped,
+      is_simulation: existing.is_simulation || is_simulation,
+      is_core_memory: existing.is_core_memory || is_core,
+    }
+    return false
+  }
+  // 不相似，正常添加
+  self.add_memory(content, is_simulation~, is_core~)
+  true
+}
+
+///|
+/// 手动合并两条记忆
+///
+/// 将 idx_b 合并到 idx_a，保留较高分数，拼接内容，
+/// 合并后 is_core 取并集（任一为核心则核心），is_simulation 取并集。
+/// idx_b 被删除。索引必须有效，否则不做操作。
+///
+/// # Example
+/// ```mbt check
+/// test {
+///   let gv = @ghostvalley.new_engine(max_memory_num=20)
+///   gv.add_memory("记忆A", is_simulation=false)
+///   gv.add_memory("记忆B", is_simulation=false)
+///   gv.merge_memories(0, 1)
+///   assert_eq(gv.memory_count(), 1)
+/// }
+/// ```
+pub fn GhostValleyEngine::merge_memories(
+  self : GhostValleyEngine,
+  idx_a : Int,
+  idx_b : Int,
+) -> Unit {
+  let bank = self.memory_bank
+  if idx_a < 0 || idx_b < 0 || idx_a == idx_b {
+    return
+  }
+  // 确保 idx_a < idx_b，先删大的不影响小的索引
+  let (lo, hi) = if idx_a < idx_b { (idx_a, idx_b) } else { (idx_b, idx_a) }
+  if hi >= bank.length() {
+    return
+  }
+  let mem_a = bank[lo]
+  let mem_b = bank[hi]
+  let merged_score = if mem_a.value_score > mem_b.value_score {
+    mem_a.value_score
+  } else {
+    mem_b.value_score
+  }
+  bank[lo] = AiMemory::{
+    content: mem_a.content + " | " + mem_b.content,
+    value_score: merged_score,
+    is_simulation: mem_a.is_simulation || mem_b.is_simulation,
+    is_core_memory: mem_a.is_core_memory || mem_b.is_core_memory,
+  }
+  ignore(bank.remove(hi))
+}

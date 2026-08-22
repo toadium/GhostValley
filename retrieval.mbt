@@ -148,3 +148,53 @@ pub fn GhostValleyEngine::core_memories(
 ) -> Array[AiMemory] {
   self.filter_memories(is_core=Some(true))
 }
+
+///|
+/// 加权综合检索
+///
+/// 将 value_score（权重 0.4）、text_similarity（权重 0.4）、时间近因（权重 0.2）
+/// 合成复合分，按复合分降序返回 top_n 条记忆。
+/// 近因分 = 记忆在库中的相对位置（越新越高），空库返回空数组。
+///
+/// # Example
+/// ```mbt check
+/// test {
+///   let gv = @ghostvalley.new_engine(max_memory_num=20)
+///   gv.add_memory("顿悟反思改进", is_simulation=false)
+///   gv.add_memory("普通日常", is_simulation=false)
+///   let results = gv.weighted_search("顿悟反思", 2)
+///   assert_true(results.length() <= 2)
+/// }
+/// ```
+pub fn GhostValleyEngine::weighted_search(
+  self : GhostValleyEngine,
+  query : String,
+  top_n : Int,
+) -> Array[AiMemory] {
+  let bank = self.memory_bank
+  if bank.length() == 0 || top_n <= 0 {
+    return []
+  }
+  // (composite_score, index)
+  let scored : Array[(Double, Int)] = []
+  let total = bank.length()
+  for i, m in bank {
+    let value_component = m.value_score * 0.4
+    let sim_component = text_similarity(query, m.content) * 0.4
+    let recency = if total > 1 {
+      i.to_double() / (total - 1).to_double()
+    } else {
+      1.0
+    }
+    let recency_component = recency * 0.2
+    let composite = value_component + sim_component + recency_component
+    scored.push((composite, i))
+  }
+  scored.sort_by(fn(a, b) { b.0.compare(a.0) })
+  let count = if top_n < scored.length() { top_n } else { scored.length() }
+  let result : Array[AiMemory] = []
+  for i in 0..<count {
+    result.push(bank[scored[i].1])
+  }
+  result
+}
