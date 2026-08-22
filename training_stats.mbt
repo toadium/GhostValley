@@ -10,13 +10,16 @@ pub(all) struct TrainingStats {
   mut total_decay_applied : Int
   avg_score_history : Array[Double]
   memory_count_history : Array[Int]
-} derive(Debug, ToJson)
+} derive(Debug, ToJson, FromJson)
 
 ///|
 pub extend TrainingStats with @debug.Debug::{to_repr}
 
 ///|
 pub extend TrainingStats with ToJson::{to_json}
+
+///|
+pub extend TrainingStats with FromJson::{from_json}
 
 ///|
 /// 创建空的训练统计

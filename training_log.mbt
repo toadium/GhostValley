@@ -7,7 +7,7 @@ pub(all) struct TrainingLogEntry {
   dilemma : String
   ai_response : String
   memory_count_after : Int
-} derive(Debug, Eq, ToJson)
+} derive(Debug, Eq, ToJson, FromJson)
 
 ///|
 pub extend TrainingLogEntry with @debug.Debug::{to_repr}
@@ -19,15 +19,21 @@ pub extend TrainingLogEntry with Eq::{equal, not_equal}
 pub extend TrainingLogEntry with ToJson::{to_json}
 
 ///|
+pub extend TrainingLogEntry with FromJson::{from_json}
+
+///|
 /// 训练日志
 ///
 /// 按时间顺序记录所有训练轮次，支持 JSON 导出和格式化输出。
 pub(all) struct TrainingLog {
   entries : Array[TrainingLogEntry]
-} derive(Debug)
+} derive(Debug, FromJson)
 
 ///|
 pub extend TrainingLog with @debug.Debug::{to_repr}
+
+///|
+pub extend TrainingLog with FromJson::{from_json}
 
 ///|
 /// 创建空的训练日志

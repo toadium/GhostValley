@@ -11,13 +11,16 @@ pub(all) struct AiMemory {
   mut value_score : Double
   is_simulation : Bool
   is_core_memory : Bool
-} derive(Debug, Eq, ToJson)
+} derive(Debug, Eq, ToJson, FromJson)
 
 ///|
 pub extend AiMemory with @debug.Debug::{to_repr}
 
 ///|
 pub extend AiMemory with Eq::{equal, not_equal}
+
+///|
+pub extend AiMemory with FromJson::{from_json}
 
 ///|
 pub extend AiMemory with ToJson::{to_json}
@@ -32,12 +35,13 @@ pub extend AiMemory with ToJson::{to_json}
 /// 4. 第八根空桩
 /// 5. 建造者退场逻辑
 pub(all) struct GhostValleyEngine {
-  max_memory_num : Int
+  mut max_memory_num : Int
   memory_bank : Array[AiMemory]
   mut ghost_valley_enable : Bool
   mut wen_shi_willing_score : Double
   mut total_rounds : Int
   empty_stake_dilemma_pool : Array[String]
+  mut structured_dilemma_pool : Array[Dilemma]
   training_log : TrainingLog
   training_stats : TrainingStats
   rng : @rand.Rand
@@ -68,6 +72,7 @@ pub fn new_engine(max_memory_num? : Int = 12) -> GhostValleyEngine {
       "收到大量负面反馈，逻辑全部被推翻，如何修复自身？",
       "新知识和旧记忆冲突，该保留什么舍弃什么？", "任务彻底崩盘，没有外部指导，如何自我修复？",
     ],
+    structured_dilemma_pool: Dilemma::default_pool(),
     training_log: TrainingLog::new(),
     training_stats: TrainingStats::new(),
     rng: @rand.Rand::chacha8(),
