@@ -183,7 +183,7 @@ pub struct TrainingLog {
 | 原项目许可证 | 由用户授权移植（概念性代码，无明确开源声明） |
 | 移植目标语言 | MoonBit |
 | 移植范围 | 五大模块全部移植 + 记忆检索/衰减/日志/配置化扩展 |
-| 移植状态 | 核心功能完整移植，110 个测试三后端全通过 |
+| 移植状态 | 核心功能完整移植，115 个测试四后端全通过 |
 
 ### 移植修改说明
 
@@ -220,14 +220,14 @@ GhostValley/
 ├── README.mbt.md         # 本文档
 ├── CHANGELOG.md          # 变更日志
 ├── LICENSE               # Apache-2.0
-└── .github/workflows/ci.yml  # CI 配置
+└── .github/workflows/ci.yml  # CI 配置（四后端）
 ```
 
 ## 测试
 
 ```bash
-moon check --target all     # 类型检查（三后端）
-moon test --target all      # 运行测试（110 个，三后端全通过）
+moon check --target all     # 类型检查（四后端）
+moon test --target all      # 运行测试（115 个，四后端全通过）
 moon fmt                    # 格式化
 ```
 

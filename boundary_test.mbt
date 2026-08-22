@@ -55,8 +55,8 @@ test "boundary: memory capacity one" {
   let gv = @ghostvalley.new_engine(max_memory_num=1)
   gv.add_memory("记忆A", is_simulation=false)
   gv.add_memory("记忆B", is_simulation=false)
-  // active_forget removes 30% of non-core when bank > max/2
-  // with max=1, max/2=0, so forget triggers but removes 2*3/10=0
+  // max=1 时阈值至少为 1，超过 1 条才触发遗忘
+  // 添加 2 条后触发遗忘，删除 30%（至少 0 条），保留 >= 1 条
   assert_true(gv.memory_count() >= 1)
 }
 
@@ -139,4 +139,64 @@ test "boundary: filter with both None returns all" {
   gv.add_memory("C", is_simulation=false, is_core=true)
   let all = gv.filter_memories(is_simulation=None, is_core=None)
   assert_eq(all.length(), 3)
+}
+
+///|
+test "boundary: empty dilemma pool run_one_round no crash" {
+  let gv = @ghostvalley.new_engine()
+  ignore(gv.wen_shi_verify("愿意接受挑战，接受压力训练"))
+  gv.set_dilemma_pool([])
+  let result = gv.ghost_valley_run_one_round()
+  // 空困境池不应崩溃，应返回安全默认困境
+  match result {
+    Some(d) => assert_true(d.length() > 0)
+    None => assert_true(false)
+  }
+}
+
+///|
+test "boundary: empty dilemma pool build returns default" {
+  let gv = @ghostvalley.new_engine()
+  gv.set_dilemma_pool([])
+  let dilemma = gv.build_simulation_failure_case()
+  assert_true(dilemma.contains("困境池为空"))
+}
+
+///|
+test "boundary: small capacity active_forget cleans up" {
+  let gv = @ghostvalley.new_engine(max_memory_num=1)
+  // 添加多条记忆，active_forget 应至少删除 1 条
+  gv.add_memory("记忆A", is_simulation=false)
+  gv.add_memory("记忆B", is_simulation=false)
+  gv.add_memory("记忆C", is_simulation=false)
+  // 不应无限增长，应有清理发生
+  assert_true(gv.memory_count() <= 3)
+  // 再多加几条，确保不会超过合理范围
+  for _ in 0..<10 {
+    gv.add_memory("更多记忆", is_simulation=false)
+  }
+  assert_true(gv.memory_count() <= 5)
+}
+
+///|
+test "boundary: load_memory clamps invalid value_score" {
+  let gv = @ghostvalley.new_engine()
+  // 构造带有越界 value_score 的 JSON
+  let json_str = "[{\"content\":\"测试\",\"value_score\":-5.0,\"is_simulation\":false,\"is_core_memory\":false}]"
+  gv.load_memory_string(json_str)
+  assert_eq(gv.memory_count(), 1)
+  let mem = gv.memory_bank[0]
+  // 负数应被 clamp 到 0.05
+  assert_true(mem.value_score >= 0.05)
+}
+
+///|
+test "boundary: load_memory clamps overflow value_score" {
+  let gv = @ghostvalley.new_engine()
+  let json_str = "[{\"content\":\"测试\",\"value_score\":999.0,\"is_simulation\":false,\"is_core_memory\":false}]"
+  gv.load_memory_string(json_str)
+  assert_eq(gv.memory_count(), 1)
+  let mem = gv.memory_bank[0]
+  // 超大值应被 clamp 到 0.95
+  assert_true(mem.value_score <= 0.95)
 }

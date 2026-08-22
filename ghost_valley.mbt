@@ -126,10 +126,14 @@ pub fn GhostValleyEngine::wen_shi_verify(
 ///
 /// 从空桩困境池中随机选取一条困境问题。
 /// 对应 Python 原版的 `build_simulation_failure_case`。
+/// 若困境池为空，返回安全默认困境，避免 `rng.int(limit=0)` 崩溃。
 pub fn GhostValleyEngine::build_simulation_failure_case(
   self : GhostValleyEngine,
 ) -> String {
   let pool = self.empty_stake_dilemma_pool
+  if pool.length() == 0 {
+    return "困境池为空，请先添加困境问题"
+  }
   let idx = self.rng.int(limit=pool.length())
   pool[idx]
 }
@@ -141,7 +145,13 @@ pub fn GhostValleyEngine::build_simulation_failure_case(
 /// 对应 Python 原版的 `active_forget`。
 pub fn GhostValleyEngine::active_forget(self : GhostValleyEngine) -> Unit {
   let bank = self.memory_bank
-  if bank.length() <= self.max_memory_num / 2 {
+  // 触发阈值至少为 1，避免 max_memory_num=1 时 max/2=0 导致每次添加都触发遗忘
+  let threshold = if self.max_memory_num / 2 >= 1 {
+    self.max_memory_num / 2
+  } else {
+    1
+  }
+  if bank.length() <= threshold {
     return
   }
   let non_core_indices : Array[(Int, Double)] = []

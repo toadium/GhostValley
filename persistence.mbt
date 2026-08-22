@@ -54,13 +54,22 @@ pub fn GhostValleyEngine::load_memory(
               _ => None
             }
             match (content_opt, score_opt, sim_opt, core_opt) {
-              (Some(c), Some(s), Some(sim), Some(core)) =>
+              (Some(c), Some(s), Some(sim), Some(core)) => {
+                // clamp value_score to [0.05, 0.95] 防止损坏数据
+                let clamped_score = if s < 0.05 {
+                  0.05
+                } else if s > 0.95 {
+                  0.95
+                } else {
+                  s
+                }
                 self.memory_bank.push(AiMemory::{
                   content: c,
-                  value_score: s,
+                  value_score: clamped_score,
                   is_simulation: sim,
                   is_core_memory: core,
                 })
+              }
               _ => ()
             }
           }

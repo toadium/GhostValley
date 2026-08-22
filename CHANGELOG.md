@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.0] - 2026-08-22
+
+### Fixed
+- **空困境池崩溃修复**：`build_simulation_failure_case` 在困境池为空时不再 panic，返回安全默认困境
+- **小容量遗忘失效修复**：`active_forget` 在 `max_memory_num` 很小（如 1）时触发阈值至少为 1，避免每次添加都触发无效遗忘
+- **持久化分数校验**：`load_memory` 从 JSON 加载时将 `value_score` clamp 到 [0.05, 0.95]，防止损坏数据破坏后续逻辑
+
+### Added
+- 5 个新边界测试：空困境池运行、空困境池默认返回、小容量遗忘清理、load_memory 负数 clamp、load_memory 超大值 clamp
+- CI 增加 js 后端测试目标
+
+### Changed
+- 测试数量：110 → 115（四后端全通过：native/wasm-gc/wasm/js）
+- CI 覆盖：三后端 → 四后端
+
 ## [0.3.0] - 2026-08-18
 
 ### Added
