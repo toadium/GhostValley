@@ -39,6 +39,7 @@ pub(all) struct GhostValleyEngine {
   mut total_rounds : Int
   empty_stake_dilemma_pool : Array[String]
   training_log : TrainingLog
+  training_stats : TrainingStats
   rng : @rand.Rand
 }
 
@@ -68,6 +69,7 @@ pub fn new_engine(max_memory_num? : Int = 12) -> GhostValleyEngine {
       "新知识和旧记忆冲突，该保留什么舍弃什么？", "任务彻底崩盘，没有外部指导，如何自我修复？",
     ],
     training_log: TrainingLog::new(),
+    training_stats: TrainingStats::new(),
     rng: @rand.Rand::chacha8(),
   }
 }
@@ -516,4 +518,72 @@ pub fn GhostValleyEngine::merge_memories(
     is_core_memory: mem_a.is_core_memory || mem_b.is_core_memory,
   }
   ignore(bank.remove(hi))
+}
+
+///|
+/// 自动化训练管道
+///
+/// 执行多轮训练，每轮：训练→LLM响应→存记忆→定期衰减→定期清理→记录统计。
+/// `decay_interval` 指定每多少轮应用一次衰减，`cleanup_threshold` 指定清理阈值。
+/// 幽灵谷未开启时直接返回。
+///
+/// # Example
+/// ```mbt check
+/// test {
+///   let gv = @ghostvalley.new_engine(max_memory_num=20)
+///   let llm = @ghostvalley.MockLLM::new()
+///   ignore(gv.wen_shi_verify("愿意接受挑战，接受压力训练"))
+///   gv.run_training_pipeline(
+///     llm,
+///     rounds=5,
+///     decay_interval=2,
+///     cleanup_threshold=0.1,
+///   )
+///   let stats = gv.get_training_stats()
+///   assert_eq(stats.total_rounds_completed, 5)
+/// }
+/// ```
+pub fn[T : LLMAdapter] GhostValleyEngine::run_training_pipeline(
+  self : GhostValleyEngine,
+  llm : T,
+  rounds~ : Int,
+  decay_interval? : Int = 5,
+  cleanup_threshold? : Double = 0.1,
+) -> Unit {
+  if !self.ghost_valley_enable || rounds <= 0 {
+    return
+  }
+  for round in 1..<=rounds {
+    // 训练 + LLM 响应 + 存记忆
+    ignore(self.run_round_with_llm(llm))
+    self.training_stats.total_rounds_completed = round
+    self.training_stats.total_memories_added = self.training_stats.total_memories_added +
+      1
+    // 定期衰减 + 清理
+    if decay_interval > 0 && round % decay_interval == 0 {
+      self.apply_decay(decay_interval)
+      self.training_stats.total_decay_applied = self.training_stats.total_decay_applied +
+        1
+      let cleaned = self.cleanup_low_value(cleanup_threshold)
+      self.training_stats.total_memories_cleaned = self.training_stats.total_memories_cleaned +
+        cleaned
+    }
+    // 记入历史
+    self.training_stats.avg_score_history.push(self.average_value_score())
+    self.training_stats.memory_count_history.push(self.memory_bank.length())
+  }
+}
+
+///|
+/// 获取训练统计
+pub fn GhostValleyEngine::get_training_stats(
+  self : GhostValleyEngine,
+) -> TrainingStats {
+  self.training_stats
+}
+
+///|
+/// 导出训练统计为 JSON 字符串
+pub fn GhostValleyEngine::export_stats_json(self : GhostValleyEngine) -> String {
+  @json.to_json(self.training_stats).stringify()
 }
