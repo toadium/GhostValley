@@ -1,5 +1,67 @@
 # Changelog
 
+## [1.0.0] - 2026-08-23
+
+### Added
+- **ARCHITECTURE.md**：完整架构文档——五大模块设计原理、数据流图、扩展点说明、API 稳定性表
+- **DESIGN_RATIONALE.md**：8 条设计决策记录——关键词匹配 vs embedding、双曲衰减、30% 遗忘率、加权检索权重等
+- README 更增完整使用教程（从安装到完整训练流程）
+- API 稳定化审查：所有公开 API 标记 stable
+
+### Changed
+- 版本 bump 到 1.0.0，标志 API 稳定化完成
+
+## [0.8.0] - 2026-08-23
+
+### Added
+- 11 个属性测试：容量上限/核心保护/排序正确性/分数范围/合并减一/去重不重复
+- 6 个模糊测试：随机 add/forget/cleanup/decay/search/merge/pipeline 不崩溃
+- 7 个基准测试：1000 条记忆下检索/遗忘/衰减/状态持久化性能基线
+
+### Fixed
+- `active_forget` 的 `remove_count` 整除为 0 时强制至少删除 1 条（修复小容量遗忘失效遗留）
+
+### Changed
+- `top_memories` 从 O(n log n) 全排序优化为 O(n*k) partial selection
+- 测试数量：192 → 216
+
+## [0.7.0] - 2026-08-23
+
+### Added
+- `Dilemma { content, category, difficulty }` 结构化困境——4 分类 x 3 难度 = 12 默认困境
+- `get_dilemma_by_category` / `get_dilemma_by_difficulty` 分类检索
+- `adaptive_dilemma(performance)` 按表现自动选难度
+- `save_engine_state` / `load_engine_state` 全状态持久化（memory + stats + config + rounds）
+- `EngineState` 结构体 + JSON roundtrip
+- 37 个测试
+
+### Changed
+- `max_memory_num` 改为 `mut` 以支持状态恢复
+- 测试数量：155 → 192
+
+## [0.6.0] - 2026-08-23
+
+### Added
+- `TrainingStats` 结构体：跨轮次指标追踪（保留率/平均分趋势/清理总数/衰减次数）
+- `run_training_pipeline(llm, rounds, decay_interval, cleanup_threshold)` 自动化训练管道
+- `get_training_stats()` / `export_stats_json()` 统计接口
+- `retention_rate()` / `score_trend()` / `format()` 统计分析方法
+- 19 个测试
+
+### Changed
+- 测试数量：136 → 155
+
+## [0.5.0] - 2026-08-23
+
+### Added
+- `weighted_search(query, top_n)` 加权综合检索：value_score*0.4 + similarity*0.4 + recency*0.2
+- `add_memory_dedup(content, threshold=0.8)` 去重添加：超阈值合并而非重复添加
+- `merge_memories(idx_a, idx_b)` 手动合并接口
+- 21 个测试
+
+### Changed
+- 测试数量：115 → 136
+
 ## [0.4.0] - 2026-08-22
 
 ### Fixed
@@ -54,7 +116,7 @@
 
 ### Changed
 - `add_memory` 用语义打分 + 随机扰动替代纯随机
-- `active_forget` 优化 O(n²) → O(n log n)
+- `active_forget` 优化 O(n^2) → O(n log n)
 - `AiMemory` 添加 `ToJson` derive
 - 警告治理 25→0（默认级别）
 

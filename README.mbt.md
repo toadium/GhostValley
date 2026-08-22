@@ -217,6 +217,8 @@ GhostValley/
 ├── decay.mbt             # 记忆衰减机制
 ├── training_log.mbt      # 训练日志系统
 ├── *_test.mbt            # 测试文件（110 个，三后端全通过）
+├── ARCHITECTURE.md       # 架构文档（五大模块/数据流/扩展点）
+├── DESIGN_RATIONALE.md   # 设计决策记录（8 条关键决策）
 ├── README.mbt.md         # 本文档
 ├── CHANGELOG.md          # 变更日志
 ├── LICENSE               # Apache-2.0
@@ -227,9 +229,92 @@ GhostValley/
 
 ```bash
 moon check --target all     # 类型检查（四后端）
-moon test --target all      # 运行测试（115 个，四后端全通过）
+moon test --target all      # 运行测试（216 个，四后端全通过）
 moon fmt                    # 格式化
 ```
+
+## 完整使用教程
+
+### 安装
+
+```bash
+moon add walkzzz/ghostvalley
+```
+
+### 快速开始
+
+```moonbit nocheck
+let gv = @ghostvalley.new_engine(max_memory_num=20)
+let llm = @ghostvalley.MockLLM::new()
+
+// 1. 温石验证：AI 是否愿意接受训练
+ignore(gv.wen_shi_verify("我愿意接受挑战，接受压力训练"))
+
+// 2. 自动化训练管道：10 轮训练，每 3 轮衰减+清理
+gv.run_training_pipeline(llm, rounds=10, decay_interval=3, cleanup_threshold=0.1)
+
+// 3. 查看训练统计
+let stats = gv.get_training_stats()
+println(stats.format())
+// 保留率: 0.80  平均分趋势: +0.15
+
+// 4. 加权检索：找最相关的高价值记忆
+let top = gv.weighted_search("顿悟反思", 5)
+
+// 5. 自适应困境：按当前表现选难度
+let dilemma = gv.adaptive_dilemma(0.75)  // 高表现 → 难度 3
+println(dilemma.content)
+
+// 6. 保存完整引擎状态（跨会话恢复）
+let state = gv.save_engine_state()
+// 下次会话：
+let gv2 = @ghostvalley.new_engine()
+gv2.load_engine_state(state)
+```
+
+### 进阶用法
+
+#### 去重添加记忆
+
+```moonbit nocheck
+let gv = @ghostvalley.new_engine(max_memory_num=20)
+// 相似内容自动合并，不重复添加
+ignore(gv.add_memory_dedup("顿悟反思改进修复迭代", is_simulation=false))
+ignore(gv.add_memory_dedup("顿悟反思改进修复迭代冷静分析", is_simulation=false))
+// 只有 1 条记忆（相似度 >= 0.8，合并）
+```
+
+#### 结构化困境池
+
+```moonbit nocheck
+let gv = @ghostvalley.new_engine()
+// 按分类检索
+let cognitive = gv.get_dilemma_by_category("cognitive")  // 3 条认知困境
+let hard = gv.get_dilemma_by_difficulty(3)               // 4 条困难困境
+
+// 自定义困境池
+let custom = [
+  @ghostvalley.Dilemma::new("自定义困境", category="emotional", difficulty=2),
+]
+gv.set_structured_dilemma_pool(custom)
+```
+
+#### 训练统计分析
+
+```moonbit nocheck
+let stats = gv.get_training_stats()
+// 保留率：当前记忆数 / 总添加数
+println("保留率: \{stats.retention_rate()}")
+// 平均分趋势：末轮平均分 - 首轮平均分
+println("趋势: \{stats.score_trend()}")
+// 导出 JSON
+let json = gv.export_stats_json()
+```
+
+### 深入阅读
+
+- [架构文档](ARCHITECTURE.md) — 五大模块设计原理、数据流图、扩展点
+- [设计决策](DESIGN_RATIONALE.md) — 为什么关键词匹配、为什么双曲衰减、为什么 30% 遗忘率
 
 ## 许可证
 
