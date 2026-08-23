@@ -193,6 +193,8 @@ test "ai_memory struct fields" {
     value_score: 0.5,
     is_simulation: true,
     is_core_memory: false,
+    access_count: 0,
+    linked_ids: [],
   }
   assert_eq(mem.content, "测试")
   assert_eq(mem.value_score, 0.5)

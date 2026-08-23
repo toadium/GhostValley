@@ -11,6 +11,8 @@ pub(all) struct AiMemory {
   mut value_score : Double
   is_simulation : Bool
   is_core_memory : Bool
+  mut access_count : Int
+  mut linked_ids : Array[(Int, Double)]
 } derive(Debug, Eq, ToJson, FromJson)
 
 ///|
@@ -212,6 +214,8 @@ pub fn GhostValleyEngine::add_memory(
     value_score: final_score,
     is_simulation,
     is_core_memory: is_core,
+    access_count: 0,
+    linked_ids: [],
   }
   self.memory_bank.push(new_mem)
   self.active_forget()
@@ -472,6 +476,8 @@ pub fn GhostValleyEngine::add_memory_dedup(
       value_score: clamped,
       is_simulation: existing.is_simulation || is_simulation,
       is_core_memory: existing.is_core_memory || is_core,
+      access_count: existing.access_count,
+      linked_ids: existing.linked_ids,
     }
     return false
   }
@@ -523,6 +529,17 @@ pub fn GhostValleyEngine::merge_memories(
     value_score: merged_score,
     is_simulation: mem_a.is_simulation || mem_b.is_simulation,
     is_core_memory: mem_a.is_core_memory || mem_b.is_core_memory,
+    access_count: mem_a.access_count + mem_b.access_count,
+    linked_ids: {
+      let merged : Array[(Int, Double)] = []
+      for link in mem_a.linked_ids {
+        merged.push(link)
+      }
+      for link in mem_b.linked_ids {
+        merged.push(link)
+      }
+      merged
+    },
   }
   ignore(bank.remove(hi))
 }

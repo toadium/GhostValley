@@ -63,11 +63,37 @@ pub fn GhostValleyEngine::load_memory(
                 } else {
                   s
                 }
+                // 解析 access_count（默认 0，向后兼容）
+                let access_count = match obj.get("access_count") {
+                  Some(Json::Number(n, ..)) => n.to_int()
+                  _ => 0
+                }
+                // 解析 linked_ids（默认 []，向后兼容）
+                let linked_ids : Array[(Int, Double)] = []
+                match obj.get("linked_ids") {
+                  Some(Json::Array(links)) =>
+                    for link in links {
+                      match link {
+                        Json::Array(pair) =>
+                          if pair.length() >= 2 {
+                            match (pair[0], pair[1]) {
+                              (Json::Number(idx, ..), Json::Number(str, ..)) =>
+                                linked_ids.push((idx.to_int(), str))
+                              _ => ()
+                            }
+                          }
+                        _ => ()
+                      }
+                    }
+                  _ => ()
+                }
                 self.memory_bank.push(AiMemory::{
                   content: c,
                   value_score: clamped_score,
                   is_simulation: sim,
                   is_core_memory: core,
+                  access_count,
+                  linked_ids,
                 })
               }
               _ => ()
@@ -201,11 +227,35 @@ pub fn GhostValleyEngine::load_engine_state(
           raw
         }
       }
+      let access_count = match m.get("access_count") {
+        Some(Json::Number(n, ..)) => n.to_int()
+        _ => 0
+      }
+      let linked_ids : Array[(Int, Double)] = []
+      match m.get("linked_ids") {
+        Some(Json::Array(links)) =>
+          for link in links {
+            match link {
+              Json::Array(pair) =>
+                if pair.length() >= 2 {
+                  match (pair[0], pair[1]) {
+                    (Json::Number(idx, ..), Json::Number(str, ..)) =>
+                      linked_ids.push((idx.to_int(), str))
+                    _ => ()
+                  }
+                }
+              _ => ()
+            }
+          }
+        _ => ()
+      }
       self.memory_bank.push(AiMemory::{
         content: m["content"].as_string().unwrap(),
         value_score: score,
         is_simulation: m["is_simulation"].as_bool().unwrap(),
         is_core_memory: m["is_core_memory"].as_bool().unwrap(),
+        access_count,
+        linked_ids,
       })
     }
     // 恢复统计

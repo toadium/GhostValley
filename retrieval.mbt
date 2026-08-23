@@ -18,8 +18,9 @@ pub fn GhostValleyEngine::search_memories(
   keyword : String,
 ) -> Array[AiMemory] {
   let results : Array[AiMemory] = []
-  for m in self.memory_bank {
+  for i, m in self.memory_bank {
     if m.content.contains(keyword) {
+      self.reinforce_memory(i)
       results.push(m)
     }
   }
@@ -50,37 +51,41 @@ pub fn GhostValleyEngine::top_memories(
   if n <= 0 || bank.length() == 0 {
     return []
   }
-  // Partial selection: maintain top-n without full sort.
+  // Partial selection: maintain top-n with indices.
   // O(n * k) where k = top_n, better than O(n log n) when n >> k.
-  let top : Array[AiMemory] = []
-  for m in bank {
+  let top : Array[(AiMemory, Int)] = []
+  for i, m in bank {
     if top.length() < n {
-      // Insert into sorted position
       let mut inserted = false
       for j in 0..<top.length() {
-        if m.value_score > top[j].value_score {
-          top.insert(j, m)
+        if m.value_score > top[j].0.value_score {
+          top.insert(j, (m, i))
           inserted = true
           break
         }
       }
       if not(inserted) {
-        top.push(m)
+        top.push((m, i))
       }
-    } else if m.value_score > top[top.length() - 1].value_score {
-      // Better than worst in top-n, replace and re-sort position
-      top[top.length() - 1] = m
-      // Bubble up to correct position
-      let mut i = top.length() - 1
-      while i > 0 && top[i].value_score > top[i - 1].value_score {
-        let tmp = top[i]
-        top[i] = top[i - 1]
-        top[i - 1] = tmp
-        i = i - 1
+    } else if m.value_score > top[top.length() - 1].0.value_score {
+      top[top.length() - 1] = (m, i)
+      let mut j = top.length() - 1
+      while j > 0 && top[j].0.value_score > top[j - 1].0.value_score {
+        let tmp = top[j]
+        top[j] = top[j - 1]
+        top[j - 1] = tmp
+        j = j - 1
       }
     }
   }
-  top
+  // Reinforce selected memories and return
+  let result : Array[AiMemory] = []
+  for i in 0..<top.length() {
+    let (m, idx) = top[i]
+    self.reinforce_memory(idx)
+    result.push(m)
+  }
+  result
 }
 
 ///|
@@ -218,7 +223,9 @@ pub fn GhostValleyEngine::weighted_search(
   let count = if top_n < scored.length() { top_n } else { scored.length() }
   let result : Array[AiMemory] = []
   for i in 0..<count {
-    result.push(bank[scored[i].1])
+    let idx = scored[i].1
+    self.reinforce_memory(idx)
+    result.push(bank[idx])
   }
   result
 }
