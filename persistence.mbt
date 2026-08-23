@@ -240,6 +240,22 @@ pub fn GhostValleyEngine::load_engine_state(
         mc_arr[i].as_number().unwrap().to_int(),
       )
     }
+    // 恢复难度历史
+    self.training_stats.round_difficulty_history.clear()
+    let diff_arr = stats_obj["round_difficulty_history"].as_array().unwrap()
+    for i in 0..<diff_arr.length() {
+      self.training_stats.round_difficulty_history.push(
+        diff_arr[i].as_number().unwrap().to_int(),
+      )
+    }
+    // 恢复分类历史
+    self.training_stats.round_category_history.clear()
+    let cat_arr = stats_obj["round_category_history"].as_array().unwrap()
+    for i in 0..<cat_arr.length() {
+      self.training_stats.round_category_history.push(
+        cat_arr[i].as_string().unwrap(),
+      )
+    }
     // 恢复配置
     self.max_memory_num = obj["max_memory_num"].as_number().unwrap().to_int()
     self.ghost_valley_enable = obj["ghost_valley_enable"].as_bool().unwrap()

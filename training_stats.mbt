@@ -10,6 +10,8 @@ pub(all) struct TrainingStats {
   mut total_decay_applied : Int
   avg_score_history : Array[Double]
   memory_count_history : Array[Int]
+  round_difficulty_history : Array[Int]
+  round_category_history : Array[String]
 } derive(Debug, ToJson, FromJson)
 
 ///|
@@ -31,6 +33,8 @@ pub fn TrainingStats::new() -> TrainingStats {
     total_decay_applied: 0,
     avg_score_history: [],
     memory_count_history: [],
+    round_difficulty_history: [],
+    round_category_history: [],
   }
 }
 

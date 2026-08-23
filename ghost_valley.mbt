@@ -561,8 +561,21 @@ pub fn[T : LLMAdapter] GhostValleyEngine::run_training_pipeline(
     return
   }
   for round in 1..<=rounds {
-    // 训练 + LLM 响应 + 存记忆
-    ignore(self.run_round_with_llm(llm))
+    // 使用结构化困境：按当前表现自适应选难度
+    let performance = self.average_value_score()
+    let dilemma = self.adaptive_dilemma(performance)
+    let ai_response = llm.generate_response(dilemma.content)
+    self.accept_ai_self_gain(ai_response)
+    self.total_rounds = self.total_rounds + 1
+    self.training_log.add_entry(
+      self.total_rounds,
+      dilemma.content,
+      ai_response,
+      self.memory_bank.length(),
+    )
+    // 追踪困境分类和难度
+    self.training_stats.round_difficulty_history.push(dilemma.difficulty)
+    self.training_stats.round_category_history.push(dilemma.category)
     self.training_stats.total_rounds_completed = round
     self.training_stats.total_memories_added = self.training_stats.total_memories_added +
       1
