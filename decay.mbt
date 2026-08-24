@@ -25,11 +25,12 @@ pub fn GhostValleyEngine::apply_decay(
   }
   for m in self.memory_bank {
     if !m.is_core_memory {
-      let half_life = m.value_score * 50.0
-      if half_life > 0.0 {
-        let decay_factor = 1.0 / (1.0 + rounds_elapsed.to_double() / half_life)
-        m.value_score = m.value_score * decay_factor
-      }
+      m.value_score = apply_decay_model(
+        self.decay_model,
+        self.decay_params,
+        m.value_score,
+        rounds_elapsed,
+      )
     }
   }
 }

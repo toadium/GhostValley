@@ -47,6 +47,10 @@ pub(all) struct GhostValleyEngine {
   training_log : TrainingLog
   training_stats : TrainingStats
   rng : @rand.Rand
+  mut scoring_config : ScoringConfig
+  mut decay_model : DecayModel
+  mut decay_params : DecayParams
+  event_system : EventSystem
 }
 
 ///|
@@ -78,6 +82,10 @@ pub fn new_engine(max_memory_num? : Int = 12) -> GhostValleyEngine {
     training_log: TrainingLog::new(),
     training_stats: TrainingStats::new(),
     rng: @rand.Rand::chacha8(),
+    scoring_config: ScoringConfig::default(),
+    decay_model: Hyperbolic,
+    decay_params: DecayParams::default(),
+    event_system: EventSystem::new(),
   }
 }
 
@@ -199,7 +207,7 @@ pub fn GhostValleyEngine::add_memory(
   is_simulation~ : Bool,
   is_core? : Bool = false,
 ) -> Unit {
-  let base_score = text_value_score(content)
+  let base_score = configurable_text_value_score(content, self.scoring_config)
   let noise = (self.rng.double() - 0.5) * 0.1
   let score = base_score + noise
   let final_score = if score < 0.05 {
@@ -596,18 +604,34 @@ pub fn[T : LLMAdapter] GhostValleyEngine::run_training_pipeline(
     self.training_stats.total_rounds_completed = round
     self.training_stats.total_memories_added = self.training_stats.total_memories_added +
       1
+    // 事件: MemoryAdded
+    self.event_system.emit("MemoryAdded", round, dilemma.content)
     // 定期衰减 + 清理
     if decay_interval > 0 && round % decay_interval == 0 {
       self.apply_decay(decay_interval)
       self.training_stats.total_decay_applied = self.training_stats.total_decay_applied +
         1
+      self.event_system.emit(
+        "DecayApplied",
+        round,
+        "decay_interval=\{decay_interval}",
+      )
       let cleaned = self.cleanup_low_value(cleanup_threshold)
       self.training_stats.total_memories_cleaned = self.training_stats.total_memories_cleaned +
         cleaned
+      if cleaned > 0 {
+        self.event_system.emit("CleanupDone", round, "cleaned=\{cleaned}")
+      }
     }
     // 记入历史
     self.training_stats.avg_score_history.push(self.average_value_score())
     self.training_stats.memory_count_history.push(self.memory_bank.length())
+    // 事件: RoundCompleted
+    self.event_system.emit(
+      "RoundCompleted",
+      round,
+      "memories=\{self.memory_bank.length()}",
+    )
   }
 }
 
@@ -623,4 +647,90 @@ pub fn GhostValleyEngine::get_training_stats(
 /// 导出训练统计为 JSON 字符串
 pub fn GhostValleyEngine::export_stats_json(self : GhostValleyEngine) -> String {
   @json.to_json(self.training_stats).stringify()
+}
+
+///|
+/// 获取评分配置
+pub fn GhostValleyEngine::get_scoring_config(
+  self : GhostValleyEngine,
+) -> ScoringConfig {
+  self.scoring_config
+}
+
+///|
+/// 设置评分配置
+pub fn GhostValleyEngine::set_scoring_config(
+  self : GhostValleyEngine,
+  config : ScoringConfig,
+) -> Unit {
+  self.scoring_config = config
+}
+
+///|
+/// 获取衰减模型
+pub fn GhostValleyEngine::get_decay_model(
+  self : GhostValleyEngine,
+) -> DecayModel {
+  self.decay_model
+}
+
+///|
+/// 设置衰减模型
+pub fn GhostValleyEngine::set_decay_model(
+  self : GhostValleyEngine,
+  model : DecayModel,
+) -> Unit {
+  self.decay_model = model
+}
+
+///|
+/// 获取衰减参数
+pub fn GhostValleyEngine::get_decay_params(
+  self : GhostValleyEngine,
+) -> DecayParams {
+  self.decay_params
+}
+
+///|
+/// 设置衰减参数
+pub fn GhostValleyEngine::set_decay_params(
+  self : GhostValleyEngine,
+  params : DecayParams,
+) -> Unit {
+  self.decay_params = params
+}
+
+///|
+/// 获取事件系统
+pub fn GhostValleyEngine::get_event_system(
+  self : GhostValleyEngine,
+) -> EventSystem {
+  self.event_system
+}
+
+///|
+/// 注册事件回调
+pub fn GhostValleyEngine::register_callback(
+  self : GhostValleyEngine,
+  event_type : String,
+  handler : (String, Int) -> Unit,
+) -> Unit {
+  self.event_system.register_callback(event_type, handler)
+}
+
+///|
+/// 获取事件日志
+pub fn GhostValleyEngine::get_event_log(
+  self : GhostValleyEngine,
+) -> Array[EventRecord] {
+  self.event_system.get_log()
+}
+
+///|
+/// 统计指定类型事件数量
+pub fn GhostValleyEngine::event_count(
+  self : GhostValleyEngine,
+  event_type : String,
+) -> Int {
+  self.event_system.event_count(event_type)
 }

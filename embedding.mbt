@@ -14,52 +14,7 @@
 /// }
 /// ```
 pub fn text_value_score(content : String) -> Double {
-  let high_value_words = [
-    "顿悟", "反思", "改进", "修复", "迭代", "区分", "筛选", "推理",
-    "冷静", "分析",
-  ]
-  let mid_value_words = [
-    "失败", "错误", "冲突", "推翻", "负面", "崩盘", "调整",
-  ]
-  let low_value_words = ["普通", "日常", "随便", "应付"]
-  let mut score = 0.15
-  let mut high_count = 0
-  let mut mid_count = 0
-  let mut low_count = 0
-  for w in high_value_words {
-    if content.contains(w) {
-      score = score + 0.12
-      high_count = high_count + 1
-    }
-  }
-  for w in mid_value_words {
-    if content.contains(w) {
-      score = score + 0.06
-      mid_count = mid_count + 1
-    }
-  }
-  for w in low_value_words {
-    if content.contains(w) {
-      score = score - 0.08
-      low_count = low_count + 1
-    }
-  }
-  if high_count >= 2 {
-    score = score + 0.1
-  }
-  if mid_count >= 2 {
-    score = score + 0.05
-  }
-  if low_count >= 2 {
-    score = score - 0.1
-  }
-  if score < 0.05 {
-    0.05
-  } else if score > 0.95 {
-    0.95
-  } else {
-    score
-  }
+  configurable_text_value_score(content, ScoringConfig::default())
 }
 
 ///|
