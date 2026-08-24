@@ -127,6 +127,37 @@ GhostValley 是一个 AI 心理压力演练系统，通过模拟困境训练 AI 
 
 `EngineState` 包含 memory + stats + config + rounds，支持跨会话训练恢复。
 
+### 3.6 训练评估 (Training Evaluator) [v1.1.0]
+
+`TrainingEvaluation` 综合评估训练效果：
+- `resilience_score`：高难度/低难度平均响应分比值，衡量能力保持率
+- `category_coverage`：4 分类训练覆盖情况，识别薄弱分类
+- `improvement_rate`：线性回归斜率，量化进步速度
+- `overall_grade`：S/A/B/C/D 总体评级
+
+### 3.7 记忆关联图谱 (Memory Association) [v1.2.0]
+
+- `link_memories(idx_a, idx_b, strength)`：双向关联，strength ∈ [0,1]
+- `associative_retrieve(start_idx, depth)`：BFS 沿关联链检索
+- `reinforce_memory(idx)`：间隔重复强化（access_count++ + value_score 微增）
+- 检索方法命中时自动 reinforce
+
+### 3.8 可配置评分 + 衰减 (Config) [v1.3.0]
+
+- `ScoringConfig`：自定义关键词/权重/奖励阈值
+- `DecayModel`：Hyperbolic/Linear/Exponential 三种衰减模型
+- `DecayParams`：衰减参数可调
+
+### 3.9 事件系统 (Event System) [v1.3.0]
+
+`TrainingEvent` 枚举 + `EventSystem` 事件日志 + 回调注册。
+训练管道自动 emit MemoryAdded/DecayApplied/CleanupDone/RoundCompleted 事件。
+
+### 3.10 训练课程 (Curriculum) [v1.4.0]
+
+`Curriculum` 定义分类间前置依赖和每分类每难度最低轮次要求。
+`run_curriculum_pipeline` 按课程进度选困境，优先补足薄弱分类。
+
 ## 4. 数据流
 
 ```
@@ -158,15 +189,20 @@ GhostValley 是一个 AI 心理压力演练系统，通过模拟困境训练 AI 
 ## 5. 文件结构
 
 ```
-ghost_valley.mbt       — 引擎主体 + 温石验证 + 安全气垫 + 主动遗忘 + 建造者退场
-retrieval.mbt          — 记忆检索 (search/top/weighted_search/filter)
-decay.mbt              — 衰减机制 + 清理
-embedding.mbt          — 关键词提取 + 语义打分 + 相似度
-training_log.mbt       — 训练日志
-training_stats.mbt     — 训练统计
-dilemma.mbt            — 结构化困境 + 分类 + 难度递进
-persistence.mbt        — 持久化 (memory + engine state)
-report.mbt             — 训练报告
+ghost_valley.mbt            — 引擎主体 + 温石验证 + 安全气垫 + 主动遗忘 + 建造者退场
+retrieval.mbt               — 记忆检索 (search/top/weighted_search/filter)
+decay.mbt                   — 衰减机制 + 清理
+embedding.mbt               — 关键词提取 + 语义打分 + 相似度
+training_log.mbt            — 训练日志
+training_stats.mbt          — 训练统计
+dilemma.mbt                 — 结构化困境 + 分类 + 难度递进
+persistence.mbt             — 持久化 (memory + engine state)
+report.mbt                  — 训练报告
+training_evaluator.mbt      — 训练评估 (韧性分/覆盖度/改善率/评级) [v1.1.0]
+memory_association.mbt      — 记忆关联图谱 + 访问追踪 [v1.2.0]
+config.mbt                  — 可配置评分 + 可配置衰减 [v1.3.0]
+event_system.mbt            — 事件系统 [v1.3.0]
+curriculum.mbt              — 训练课程体系 [v1.4.0]
 ```
 
 ## 6. API 稳定性
@@ -183,3 +219,9 @@ report.mbt             — 训练报告
 | `Dilemma` / `adaptive_dilemma` / `get_dilemma_by_category` | stable | v0.7.0 |
 | `save_engine_state` / `load_engine_state` | stable | v0.7.0 |
 | `LLMAdapter` trait / `MockLLM` | stable | v0.2.0 |
+| `resilience_score` / `category_coverage` / `improvement_rate` / `evaluate_training` | stable | v1.1.0 |
+| `link_memories` / `associative_retrieve` / `reinforce_memory` / `access_frequency_report` | stable | v1.2.0 |
+| `ScoringConfig` / `configurable_text_value_score` / `set_scoring_config` | stable | v1.3.0 |
+| `DecayModel` / `DecayParams` / `set_decay_model` / `set_decay_params` | stable | v1.3.0 |
+| `EventSystem` / `register_callback` / `get_event_log` / `event_count` | stable | v1.3.0 |
+| `Curriculum` / `curriculum_next_dilemma` / `curriculum_progress` / `run_curriculum_pipeline` | stable | v1.4.0 |

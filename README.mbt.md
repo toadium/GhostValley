@@ -183,7 +183,7 @@ pub struct TrainingLog {
 | 原项目许可证 | 由用户授权移植（概念性代码，无明确开源声明） |
 | 移植目标语言 | MoonBit |
 | 移植范围 | 五大模块全部移植 + 记忆检索/衰减/日志/配置化扩展 |
-| 移植状态 | 核心功能完整移植，115 个测试四后端全通过 |
+| 移植状态 | 核心功能完整移植，300 个测试三后端全通过 |
 
 ### 移植修改说明
 
@@ -216,7 +216,7 @@ GhostValley/
 ├── retrieval.mbt         # 记忆检索 API
 ├── decay.mbt             # 记忆衰减机制
 ├── training_log.mbt      # 训练日志系统
-├── *_test.mbt            # 测试文件（110 个，三后端全通过）
+├── *_test.mbt            # 测试文件（17 个，三后端全通过）
 ├── ARCHITECTURE.md       # 架构文档（五大模块/数据流/扩展点）
 ├── DESIGN_RATIONALE.md   # 设计决策记录（8 条关键决策）
 ├── README.mbt.md         # 本文档
@@ -225,11 +225,35 @@ GhostValley/
 └── .github/workflows/ci.yml  # CI 配置（四后端）
 ```
 
+## v1.1.0 - v1.4.0 新增功能
+
+### v1.1.0 训练评估 + 质量度量
+- `resilience_score()`：韧性分（高难度/低难度响应分比值）
+- `category_coverage()`：4 分类训练覆盖情况
+- `improvement_rate()`：线性回归斜率量化进步速度
+- `evaluate_training()`：综合评估 + S/A/B/C/D 评级
+
+### v1.2.0 记忆关联图谱 + 访问追踪
+- `link_memories(idx_a, idx_b, strength)`：记忆间双向关联
+- `associative_retrieve(start_idx, depth)`：BFS 沿关联链检索
+- `reinforce_memory(idx)`：间隔重复强化（类似 Anki）
+- 检索方法命中时自动 reinforce
+
+### v1.3.0 可配置评分 + 事件系统 + 可配置衰减
+- `ScoringConfig`：自定义关键词/权重
+- `DecayModel`：Hyperbolic/Linear/Exponential 三种衰减模型
+- `EventSystem`：事件日志 + 回调注册
+
+### v1.4.0 训练课程体系
+- `Curriculum`：分类间前置依赖 + 每分类每难度最低轮次要求
+- `curriculum_next_dilemma()`：按课程进度选困境
+- `run_curriculum_pipeline()`：课程驱动训练管道
+
 ## 测试
 
 ```bash
 moon check --target all     # 类型检查（四后端）
-moon test --target all      # 运行测试（216 个，四后端全通过）
+moon test --target all      # 运行测试（300 个，三后端全通过）
 moon fmt                    # 格式化
 ```
 

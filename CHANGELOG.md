@@ -1,5 +1,56 @@
 # Changelog
 
+## [1.4.0] - 2026-08-24
+
+### Added
+- **训练课程体系**：Curriculum 结构体——分类间前置依赖 + 每分类每难度最低轮次要求 + 完成判定
+- curriculum_next_dilemma()：按课程进度选困境，优先补足薄弱分类，前置依赖满足后才解锁
+- curriculum_progress()：各分类完成度（0-1）+ 总体完成率 + 下一步建议
+- run_curriculum_pipeline()：课程驱动的训练管道
+- CurriculumProgress::format()：格式化课程进度报告
+
+## [1.3.0] - 2026-08-24
+
+### Added
+- **可配置评分**：ScoringConfig 结构体——自定义高/中/低价值关键词及权重，configurable_text_value_score()
+- **可配置衰减**：DecayModel 枚举（Hyperbolic/Linear/Exponential）+ DecayParams 可调参数
+- **事件系统**：TrainingEvent 枚举 + EventSystem 事件日志 + 回调注册 register_callback + emit
+- 训练管道自动 emit 事件（MemoryAdded/DecayApplied/CleanupDone/RoundCompleted）
+- 引擎配置访问器：get/set_scoring_config, get/set_decay_model, get/set_decay_params
+- 事件查询：get_event_log, event_count
+
+### Changed
+- text_value_score 改为调用默认配置的便捷方法（向后兼容）
+- apply_decay 按引擎配置的衰减模型计算（默认仍为 Hyperbolic，向后兼容）
+- add_memory 使用引擎 scoring_config 而非全局硬编码
+
+## [1.2.0] - 2026-08-24
+
+### Added
+- **记忆关联图谱**：AiMemory 新增 access_count + linked_ids 字段
+- link_memories()：双向关联建立，strength ∈ [0,1]
+- associative_retrieve()：BFS 沿关联链检索
+- reinforce_memory()：间隔重复强化（access_count++ + value_score 微增）
+- access_frequency_report()：按访问频率排序的记忆列表
+- 检索方法（search_memories/weighted_search/top_memories）命中时自动 reinforce
+
+### Changed
+- 持久化向后兼容：旧数据默认 access_count=0/linked_ids=[]
+
+## [1.1.0] - 2026-08-24
+
+### Added
+- **训练评估体系**：TrainingEvaluator——韧性分、分类覆盖度、改善率、S/A/B/C/D 评级
+- resilience_score()：高难度/低难度平均响应分比值
+- category_coverage()：4 分类训练覆盖情况
+- improvement_rate()：线性回归斜率量化进步速度
+- evaluate_training()：综合评估接口
+- TrainingEvaluation::format()：格式化评估报告
+
+### Changed
+- run_training_pipeline 改用 adaptive_dilemma 结构化困境
+- TrainingStats 新增 round_difficulty_history/round_category_history
+
 ## [1.0.0] - 2026-08-23
 
 ### Added
