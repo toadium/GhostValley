@@ -158,6 +158,30 @@ GhostValley 是一个 AI 心理压力演练系统，通过模拟困境训练 AI 
 `Curriculum` 定义分类间前置依赖和每分类每难度最低轮次要求。
 `run_curriculum_pipeline` 按课程进度选困境，优先补足薄弱分类。
 
+### 3.11 多智能体对比训练 (Multi-Agent) [v1.5.0]
+
+- `ComparativeResult`：同一困境下两个 LLM 响应对比
+- `cross_pollinate`：交叉学习，导入高价值记忆
+- `MultiAgentSession`：多引擎实例管理 + `cross_learn_all`
+
+### 3.12 记忆聚类 (Memory Clustering) [v1.6.0]
+
+- `cluster_memories(threshold)`：按文本相似度自动分组
+- `auto_link(threshold, strength)`：自动为相似记忆建链
+- `adaptive_reinforce(idx)`：自适应递减强化（边际递减效应）
+
+### 3.13 训练检查点 + 回放 (Checkpoint) [v1.7.0]
+
+- `TrainingCheckpoint`：保存训练中间状态，支持断点续训
+- `replay_training(log, new_config?)`：从日志重建困境序列，换配置重跑
+
+### 3.14 高级统计 + 导出 (Advanced Stats) [v1.8.0]
+
+- `confidence_interval(scores, level)`：置信区间（90%/95%/99%）
+- `significance_test(before, after)`：简化 t 检验
+- `export_report_csv()` / `export_evaluation_json()`：导出
+- `training_summary()`：人类可读完整训练报告
+
 ## 4. 数据流
 
 ```
@@ -225,3 +249,7 @@ curriculum.mbt              — 训练课程体系 [v1.4.0]
 | `DecayModel` / `DecayParams` / `set_decay_model` / `set_decay_params` | stable | v1.3.0 |
 | `EventSystem` / `register_callback` / `get_event_log` / `event_count` | stable | v1.3.0 |
 | `Curriculum` / `curriculum_next_dilemma` / `curriculum_progress` / `run_curriculum_pipeline` | stable | v1.4.0 |
+| `ComparativeResult` / `run_comparative_round` / `run_comparative_pipeline` / `cross_pollinate` / `MultiAgentSession` | stable | v1.5.0 |
+| `cluster_memories` / `auto_link` / `cluster_statistics` / `adaptive_reinforce` | stable | v1.6.0 |
+| `TrainingCheckpoint` / `save_checkpoint` / `load_checkpoint` / `resume_training` / `replay_training` | stable | v1.7.0 |
+| `confidence_interval` / `significance_test` / `export_report_csv` / `export_evaluation_json` / `training_summary` | stable | v1.8.0 |

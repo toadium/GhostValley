@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.8.0] - 2026-08-25
+
+### Added
+- **高级统计**：confidence_interval(scores, level) 置信区间（90%/95%/99%）
+- **显著性检验**：significance_test(before, after) 简化 t 检验，SignificanceResult
+- **CSV 导出**：export_report_csv() 训练统计导出为 CSV
+- **JSON 评估导出**：export_evaluation_json() 综合评估导出为结构化 JSON
+- **训练总结**：training_summary() 人类可读完整训练报告（评估+课程+事件+建议）
+
+## [1.7.0] - 2026-08-25
+
+### Added
+- **训练检查点**：TrainingCheckpoint + save/load_checkpoint() 断点续训
+- **训练回放**：replay_training(log, new_config?) 从日志重建困境序列重跑
+- ReplayResult 原训练 vs 回放训练对比
+- resume_training(checkpoint, llm, additional_rounds) 断点续训
+
+## [1.6.0] - 2026-08-25
+
+### Added
+- **记忆聚类**：cluster_memories(threshold) 按文本相似度分组
+- **自动关联**：auto_link(threshold, strength) 自动为相似记忆建链
+- **簇统计**：ClusterSummary + cluster_statistics()
+- **自适应强化**：adaptive_reinforce(idx) 增量随 access_count 递减
+
+### Changed
+- reinforce_memory 改用 adaptive_reinforce（边际递减效应）
+
+## [1.5.0] - 2026-08-25
+
+### Added
+- **多智能体对比训练**：ComparativeResult + compare_responses + run_comparative_round/pipeline
+- **交叉学习**：cross_pollinate(target, source, top_n) 导入高价值记忆
+- **多智能体会话**：MultiAgentSession 管理多引擎 + cross_learn_all()
+
 ## [1.4.0] - 2026-08-24
 
 ### Added

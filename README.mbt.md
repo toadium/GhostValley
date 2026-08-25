@@ -183,7 +183,7 @@ pub struct TrainingLog {
 | 原项目许可证 | 由用户授权移植（概念性代码，无明确开源声明） |
 | 移植目标语言 | MoonBit |
 | 移植范围 | 五大模块全部移植 + 记忆检索/衰减/日志/配置化扩展 |
-| 移植状态 | 核心功能完整移植，300 个测试三后端全通过 |
+| 移植状态 | 核心功能完整移植，389 个测试三后端全通过 |
 
 ### 移植修改说明
 
@@ -216,7 +216,7 @@ GhostValley/
 ├── retrieval.mbt         # 记忆检索 API
 ├── decay.mbt             # 记忆衰减机制
 ├── training_log.mbt      # 训练日志系统
-├── *_test.mbt            # 测试文件（17 个，三后端全通过）
+├── *_test.mbt            # 测试文件（21 个，三后端全通过）
 ├── ARCHITECTURE.md       # 架构文档（五大模块/数据流/扩展点）
 ├── DESIGN_RATIONALE.md   # 设计决策记录（8 条关键决策）
 ├── README.mbt.md         # 本文档
@@ -249,11 +249,34 @@ GhostValley/
 - `curriculum_next_dilemma()`：按课程进度选困境
 - `run_curriculum_pipeline()`：课程驱动训练管道
 
+## v1.5.0 - v1.8.0 新增功能
+
+### v1.5.0 多智能体对比训练
+- `ComparativeResult`：同一困境下两个 LLM 响应对比
+- `cross_pollinate(target, source, top_n)`：交叉学习
+- `MultiAgentSession`：多引擎实例管理 + `cross_learn_all()`
+
+### v1.6.0 记忆聚类 + 自动关联
+- `cluster_memories(threshold)`：按文本相似度自动分组
+- `auto_link(threshold, strength)`：自动为相似记忆建链
+- `adaptive_reinforce(idx)`：自适应递减强化（边际递减）
+
+### v1.7.0 训练检查点 + 回放
+- `TrainingCheckpoint`：保存/恢复训练中间状态
+- `resume_training(checkpoint, llm, additional_rounds)`：断点续训
+- `replay_training(log, new_config?)`：换配置回放历史训练
+
+### v1.8.0 高级统计 + 导出
+- `confidence_interval(scores, level)`：置信区间
+- `significance_test(before, after)`：简化 t 检验
+- `export_report_csv()` / `export_evaluation_json()`：导出
+- `training_summary()`：完整训练总结
+
 ## 测试
 
 ```bash
 moon check --target all     # 类型检查（四后端）
-moon test --target all      # 运行测试（300 个，三后端全通过）
+moon test --target all      # 运行测试（389 个，三后端全通过）
 moon fmt                    # 格式化
 ```
 
