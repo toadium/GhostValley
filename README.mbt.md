@@ -272,11 +272,36 @@ GhostValley/
 - `export_report_csv()` / `export_evaluation_json()`：导出
 - `training_summary()`：完整训练总结
 
+## v1.9.0 - v1.12.0 新增功能
+
+### v1.9.0 情绪状态建模 + 权重检索
+- `EmotionState`：stress_level/confidence/resilience 情绪追踪
+- `update()` / `recover()` / `is_breakdown()`：情绪更新与崩溃检测
+- `EmotionProfile`：训练全程情绪统计画像
+- `WeightStrategy`：Recency/Frequency/Value/Combined 加权检索
+
+### v1.10.0 困境场景库 + 自定义模板
+- `DilemmaTemplate`：支持 {var} 变量插值的困境模板
+- `DilemmaLibrary`：多场景困境管理 + 5 个预置业务场景
+- 预置场景：客服危机、项目延期、团队冲突、技术选型失误、安全事故复盘
+
+### v1.11.0 训练协议 + 安全边界 + 审计日志
+- `TrainingProtocol`：max_stress/min_confidence 安全边界
+- `protocol_check()` / `enforce_protocol()`：协议检查与强制执行
+- `AuditLog`：审计日志 + CSV 导出
+- `cooldown_period()`：冷却期情绪恢复
+
+### v1.12.0 可视化报告 + 导出增强
+- `generate_ascii_chart()`：ASCII 折线图（分数趋势）
+- `generate_ascii_bar()`：ASCII 柱状图（分类覆盖度）
+- `render_dashboard()`：完整训练仪表盘
+- `export_full_report_markdown()`：Markdown 完整报告
+
 ## 测试
 
 ```bash
 moon check --target all     # 类型检查（四后端）
-moon test --target all      # 运行测试（389 个，三后端全通过）
+moon test --target all      # 运行测试（480 个，wasm-gc/js 后端全通过）
 moon fmt                    # 格式化
 ```
 

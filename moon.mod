@@ -1,6 +1,6 @@
 name = "walkzzz/ghostvalley"
 
-version = "1.11.0"
+version = "1.12.0"
 
 readme = "README.mbt.md"
 

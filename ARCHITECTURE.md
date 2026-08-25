@@ -253,3 +253,67 @@ curriculum.mbt              — 训练课程体系 [v1.4.0]
 | `cluster_memories` / `auto_link` / `cluster_statistics` / `adaptive_reinforce` | stable | v1.6.0 |
 | `TrainingCheckpoint` / `save_checkpoint` / `load_checkpoint` / `resume_training` / `replay_training` | stable | v1.7.0 |
 | `confidence_interval` / `significance_test` / `export_report_csv` / `export_evaluation_json` / `training_summary` | stable | v1.8.0 |
+
+## 3. v1.9.0 - v1.12.0 扩展架构
+
+### 3.1 情绪状态建模 (v1.9.0)
+
+```
+┌─────────────────────────────────┐
+│        EmotionState             │
+│  stress_level ──→ [0, 1]       │
+│  confidence   ──→ [0, 1]       │
+│  resilience   ──→ [0, 1]       │
+│  mood_history ──→ [Snapshot]   │
+└──────────┬──────────────────────┘
+           │
+     ┌─────┴──────┐
+     │ update()   │  困境难度→压力↑
+     │ recover()  │  压力衰减5%
+     │ breakdown()│  stress>0.9 && conf<0.2
+     └────────────┘
+```
+
+### 3.2 困境场景库 (v1.10.0)
+
+```
+DilemmaLibrary
+├── 客服危机 (5 templates)
+├── 项目延期 (5 templates)
+├── 团队冲突 (5 templates)
+├── 技术选型失误 (5 templates)
+└── 安全事故复盘 (5 templates)
+
+DilemmaTemplate
+  template_text: "收到{count}条差评..."
+  variables: ["count", "product"]
+  → instantiate([("count","50")]) → Dilemma
+```
+
+### 3.3 安全协议 + 审计 (v1.11.0)
+
+```
+TrainingProtocol
+  ├── max_stress_level: 0.85
+  ├── min_confidence: 0.15
+  └── cooldown_rounds: 3
+       │
+       ▼
+enforce_protocol()
+  ├── protocol_check() → violations
+  ├── AuditLog.add_entry()
+  └── needs_cooldown? → cooldown_period()
+```
+
+### 3.4 可视化报告 (v1.12.0)
+
+```
+render_dashboard(engine)
+  ├── score_chart (ASCII 折线图)
+  ├── category_chart (ASCII 柱状图)
+  ├── memory_distribution
+  └── summary
+
+export_full_report_markdown(engine)
+  → Markdown 报告 (表格+图表+建议)
+```

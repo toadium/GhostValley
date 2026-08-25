@@ -1,5 +1,51 @@
 # Changelog
 
+## [1.12.0] - 2026-08-25
+
+### Added
+- **ASCII 折线图**：generate_ascii_chart(scores, title) 训练分数趋势可视化
+- **ASCII 柱状图**：generate_ascii_bar(data, title) 分类覆盖度可视化
+- **训练仪表盘**：TrainingDashboard + render_dashboard() 整合所有可视化
+- **Markdown 报告导出**：export_full_report_markdown() 含表格+图表+建议的完整报告
+- **情绪状态建模**：EmotionState（stress/confidence/resilience）+ update/recover/is_breakdown
+- **情绪画像**：EmotionProfile 训练全程情绪统计 + trajectory/confidence_trajectory
+- **权重检索策略**：WeightStrategy 枚举（Recency/Frequency/Value/Combined）+ weighted_retrieve
+- **困境场景库**：DilemmaLibrary + DilemmaTemplate 支持变量插值
+- **5 个预置业务场景**：客服危机、项目延期、团队冲突、技术选型失误、安全事故复盘
+- **训练安全协议**：TrainingProtocol + protocol_check + ProtocolViolation
+- **审计日志**：AuditLog + AuditEntry + query_by_action/query_by_risk/export_csv
+- **协议强制执行**：enforce_protocol + cooldown_period 冷却期恢复
+- **3 个业务综合示例**：客服危机处理、技术团队压力演练、新员工入职心理建设
+
+## [1.11.0] - 2026-08-25
+
+### Added
+- **训练安全协议**：TrainingProtocol（max_stress_level, min_confidence, max_rounds_without_improvement, cooldown_rounds）
+- **协议检查**：protocol_check() 检查压力超限/信心过低/无改善/崩溃
+- **协议违反**：ProtocolViolation 结构体记录违反详情
+- **审计日志**：AuditEntry + AuditLog + add_entry/query_by_action/query_by_risk/export_audit_csv
+- **协议强制执行**：enforce_protocol() 违反时记录审计并暂停训练
+- **冷却期**：cooldown_period() 暂停训练执行情绪恢复
+
+## [1.10.0] - 2026-08-25
+
+### Added
+- **困境模板**：DilemmaTemplate 支持变量插值 {var_name}
+- **困境场景库**：DilemmaLibrary 管理多场景困境模板集合
+- **5 个预置业务场景**：客服危机、项目延期、团队冲突、技术选型失误、安全事故复盘
+- **模板实例化**：instantiate() 将模板变量替换为实际值
+- **场景检索**：get_dilemmas/get_all_templates/list_scenarios
+
+## [1.9.0] - 2026-08-25
+
+### Added
+- **情绪状态建模**：EmotionState（stress_level, confidence, resilience, mood_history）
+- **情绪更新**：update() 困境难度→压力↑，响应质量→信心↑
+- **情绪恢复**：recover() 压力衰减5%，信心向0.5回归3%
+- **压力崩溃检测**：is_breakdown() stress>0.9 且 confidence<0.2
+- **情绪画像**：EmotionProfile 全程统计 + trajectory/confidence_trajectory
+- **权重检索策略**：WeightStrategy（Recency/Frequency/Value/Combined）+ weighted_retrieve
+
 ## [1.8.0] - 2026-08-25
 
 ### Added
