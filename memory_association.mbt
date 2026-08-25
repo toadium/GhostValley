@@ -67,13 +67,8 @@ pub fn GhostValleyEngine::reinforce_memory(
   self : GhostValleyEngine,
   idx : Int,
 ) -> Unit {
-  let bank = self.memory_bank
-  if idx < 0 || idx >= bank.length() {
-    return
-  }
-  bank[idx].access_count = bank[idx].access_count + 1
-  let new_score = bank[idx].value_score + 0.02
-  bank[idx].value_score = if new_score > 0.95 { 0.95 } else { new_score }
+  // 使用自适应递减强化（v1.6.0）
+  self.adaptive_reinforce(idx)
 }
 
 ///|
