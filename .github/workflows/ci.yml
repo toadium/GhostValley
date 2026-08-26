@@ -12,19 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install MoonBit
+      - name: Install MoonBit (pre-release)
         uses: hustcer/setup-moonbit@v1
+        with:
+          version: 'pre-release'
 
-      - name: Debug — MoonBit Version & PATH
-        run: |
-          echo "PATH=$PATH"
-          which moon || echo "moon not found"
-          moon version --all || echo "moon version failed"
-
-      - name: Debug — Project Structure
-        run: |
-          ls -la
-          cat moon.mod
+      - name: Print MoonBit Version
+        run: moon version --all
 
       - name: Test (wasm-gc)
         run: moon test --target wasm-gc

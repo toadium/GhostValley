@@ -10,6 +10,8 @@ license = "Apache-2.0"
 
 keywords = [ "ai", "psychology", "training", "ghost-valley", "moonbit" ]
 
-preferred_target = "native"
-
 description = "幽灵谷工程 - AI心理压力演练系统，基于 MoonBit 构建"
+
+options(
+  preferred_target: "native",
+)
