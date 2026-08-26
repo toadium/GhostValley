@@ -14,6 +14,11 @@ jobs:
 
       - name: Install MoonBit
         uses: hustcer/setup-moonbit@v1
+        with:
+          version: '0.10.9'
+
+      - name: Print MoonBit Version
+        run: moon version --all
 
       - name: Test (wasm-gc)
         run: moon test --target wasm-gc
