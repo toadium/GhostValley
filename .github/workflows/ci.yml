@@ -18,10 +18,23 @@ jobs:
           version: 'pre-release'
 
       - name: Print MoonBit Version
-        run: moon version --all
+        run: |
+          moon version --all
+          echo "---"
+          ls -la
+          echo "---"
+          cat moon.mod
+          echo "---"
+          find . -name "moon.pkg" -not -path "./.git/*" | head -10
 
       - name: Test (wasm-gc)
-        run: moon test --target wasm-gc
+        run: |
+          moon test --target wasm-gc 2>&1 || {
+            echo "EXIT CODE: $?"
+            echo "--- moon test failed, trying moon check ---"
+            moon check --target wasm-gc 2>&1 || true
+            exit 1
+          }
 
       - name: Test (wasm)
         run: moon test --target wasm
