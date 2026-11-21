@@ -106,6 +106,22 @@ const MUTATIONS = [
   }`,
     pkg: PKG,
   },
+  {
+    id: "M11",
+    name: "严格质量门槛不再回退",
+    file: "qwen_adapter.mbt",
+    find: "if self.quality_gate && !qwen_is_acceptable(qwen_assess_response(cleaned)) {",
+    replace: "if false {",
+    pkg: PKG,
+  },
+  {
+    id: "M12",
+    name: "三元组重复率恒为 0",
+    file: "qwen_quality.mbt",
+    find: "1.0 - seen.length().to_double() / total.to_double()",
+    replace: "0.0",
+    pkg: PKG,
+  },
 ];
 
 function runTests() {

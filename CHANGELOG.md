@@ -1,6 +1,17 @@
 # Changelog
 
-## [1.13.0] - 2026-11-21
+## [1.14.0] - 2026-11-21
+
+### Added
+- **Qwen 响应质量层**：qwen_assess_response / qwen_is_acceptable / qwen_safe_response / qwen_corpus_quality_summary
+- **严格回放**：QwenReplayLLM::new_strict() 对低质量/含安全词响应回退
+- **144 次本地推理评测**：scripts/qwen_benchmark.py + docs/QWEN_BENCHMARK.md / qwen_benchmark.json
+- **新增 9 个 Qwen 质量测试**（489 → 498）
+
+### Changed
+- 0.5B 输出质量结论：12 条原始语料仅 3 条达质量门槛；严格模式覆盖此风险
+
+## ## [1.13.0] - 2026-11-21
 
 ### Added
 - **Qwen2.5-0.5B-Instruct 本地模型回放**：QwenReplayLLM（12 条真实响应，跨后端确定性回放）

@@ -23,7 +23,7 @@
 - `QwenReplayLLM`：12 条 Qwen2.5-0.5B-Instruct 真实响应，编译进 `qwen_corpus.mbt`，四后端确定性回放。
 - 评测：平均延迟 488 ms、平均响应 26.8 字、191 tokens，详见 [docs/QWEN_EVAL.md](docs/QWEN_EVAL.md)。
 - 重新生成语料：`python scripts/qwen_generate.py`（本地 GGUF + llama-cpp-python）。
-- 质量门禁：489 × 4 测试、覆盖率 91.6%、变异 10/10、严格零警告。
+- 质量门禁：498 × 4 测试、覆盖率 91.6%、变异 10/10、严格零警告。
 
 ## 快速开始
 
@@ -308,7 +308,7 @@ GhostValley/
 
 ```bash
 moon check --target all     # 类型检查（四后端）
-moon test --target all      # 运行测试（489 个，wasm-gc/js 后端全通过）
+moon test --target all      # 运行测试（498 个，wasm-gc/js 后端全通过）
 moon fmt                    # 格式化
 ```
 

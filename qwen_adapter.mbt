@@ -7,6 +7,8 @@ pub(all) struct QwenConfig {
   fallback : String
   /// 相似度匹配阈值（0~1）
   match_threshold : Double
+  /// 是否启用响应质量门槛（不合格回退）
+  quality_gate : Bool
 }
 
 ///|
@@ -15,6 +17,7 @@ pub fn QwenConfig::default() -> QwenConfig {
     max_response_chars: 120,
     fallback: "先承认失败，再拆解问题，从最小可验证的一步重新开始。",
     match_threshold: 0.3,
+    quality_gate: false,
   }
 }
 
@@ -28,6 +31,7 @@ pub(all) struct QwenReplayLLM {
   fallback : String
   max_chars : Int32
   threshold : Double
+  quality_gate : Bool
   mut hits : Int32
   mut misses : Int32
 }
@@ -35,6 +39,17 @@ pub(all) struct QwenReplayLLM {
 ///|
 pub fn QwenReplayLLM::new() -> QwenReplayLLM {
   QwenReplayLLM::with_config(QwenConfig::default())
+}
+
+///|
+/// 严格模式：命中语料但质量不合格（空/过短/过长/重复/安全词）时回退。
+pub fn QwenReplayLLM::new_strict() -> QwenReplayLLM {
+  QwenReplayLLM::with_config({
+    max_response_chars: 120,
+    fallback: "先承认失败，再拆解问题，从最小可验证的一步重新开始。",
+    match_threshold: 0.3,
+    quality_gate: true,
+  })
 }
 
 ///|
@@ -48,6 +63,7 @@ pub fn QwenReplayLLM::with_config(config : QwenConfig) -> QwenReplayLLM {
     fallback: config.fallback,
     max_chars: config.max_response_chars,
     threshold: config.match_threshold,
+    quality_gate: config.quality_gate,
     hits: 0,
     misses: 0,
   }
@@ -146,8 +162,14 @@ pub fn qwen_response_for(prompt : String) -> String? {
 fn QwenReplayLLM::response_for(self : QwenReplayLLM, prompt : String) -> String {
   match qwen_response_for(prompt) {
     Some(response) => {
-      self.hits = self.hits + 1
-      qwen_clean_response(response, self.max_chars)
+      let cleaned = qwen_clean_response(response, self.max_chars)
+      if self.quality_gate && !qwen_is_acceptable(qwen_assess_response(cleaned)) {
+        self.misses = self.misses + 1
+        qwen_clean_response(self.fallback, self.max_chars)
+      } else {
+        self.hits = self.hits + 1
+        cleaned
+      }
     }
     None => {
       self.misses = self.misses + 1
