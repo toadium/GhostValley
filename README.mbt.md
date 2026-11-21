@@ -1,5 +1,7 @@
 # GhostValley 幽灵谷工程
 
+> 立项材料：[申报书](申报书.md) · [自查报告](自查报告.md) · [技术附件](docs/proposal_appendix.md) · [已知缺口](docs/known-gaps.md) · [模型卡](docs/MODEL_CARD.md) · [数据卡](docs/DATA_CARD.md)
+
 > **本项目为 Python 幽灵谷工程的 MoonBit 移植版**（T2 移植项目）。
 >
 > AI 心理压力演练系统，基于 MoonBit 构建。通过可控的模拟挫折与压力训练，锤炼 AI 抗压自愈能力，让 AI 在自主经历困境中自我顿悟、迭代进化。
@@ -190,7 +192,7 @@ pub struct TrainingLog {
 | 原项目许可证 | 由用户授权移植（概念性代码，无明确开源声明） |
 | 移植目标语言 | MoonBit |
 | 移植范围 | 五大模块全部移植 + 记忆检索/衰减/日志/配置化扩展 |
-| 移植状态 | 核心功能完整移植，389 个测试三后端全通过 |
+| 移植状态 | 核心功能完整移植，503 个测试四后端全通过 |
 
 ### 移植修改说明
 
@@ -308,7 +310,7 @@ GhostValley/
 
 ```bash
 moon check --target all     # 类型检查（四后端）
-moon test --target all      # 运行测试（503 个，wasm-gc/js 后端全通过）
+moon test --target all      # 运行测试（503 个，四后端全通过）
 moon fmt                    # 格式化
 ```
 

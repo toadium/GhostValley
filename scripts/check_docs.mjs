@@ -63,6 +63,43 @@ check("A16 CI 四后端测试矩阵", ci.includes("wasm-gc") && ci.includes("nat
 check("A17 README 含 Qwen 评测链接", readme.includes("docs/QWEN_EVAL.md"), "README 缺 QWEN_EVAL 链接");
 check("A18 许可证 Apache-2.0", read("LICENSE").toLowerCase().includes("apache"), "LICENSE 非 Apache-2.0");
 
+for (const file of [
+  "CONTRIBUTING.md",
+  "SECURITY.md",
+  "CODE_OF_CONDUCT.md",
+  "docs/known-gaps.md",
+  "docs/MODEL_CARD.md",
+  "docs/DATA_CARD.md",
+]) {
+  check(`A19 立项材料存在 ${file}`, existsSync(resolve(root, file)), "文件不存在");
+}
+check(
+  "A20 Qwen 精选示例存在",
+  existsSync(resolve(root, "examples/qwen_curated/moon.pkg")) &&
+    existsSync(resolve(root, "examples/qwen_curated/qwen_curated_demo.mbt")),
+  "examples/qwen_curated 不完整",
+);
+check(
+  "A21 申报书含 Gitlink / AI 说明 / 3 场景",
+  proposal.includes("Gitlink") &&
+    proposal.includes("AI 使用说明") &&
+    proposal.includes("三个使用场景"),
+  "申报书缺少立项关键字段",
+);
+check("A22 README 含立项材料入口", readme.includes("立项材料："), "README 缺立项材料链接");
+const proposalLines = proposal.split("\n").length;
+check("A23 申报书 ≤60 行", proposalLines <= 60, `${proposalLines} 行`);
+check(
+  "A24 语料口径 9/12 + 23/24",
+  qwenEval.includes("9/12") && qwenEval.includes("23/24"),
+  "QWEN_EVAL 语料口径不一致",
+);
+check(
+  "A25 CI 含 Qwen 精选示例 smoke",
+  ci.includes("examples/qwen_curated"),
+  "ci.yml 缺示例 smoke",
+);
+
 console.log(`passed ${passes.length}, failed ${failures.length}`);
 if (failures.length > 0) {
   console.error("docs consistency failed:");

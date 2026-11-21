@@ -28,6 +28,8 @@ jobs:
         run: moon build --target all --warn-list +73 --deny-warn
       - name: Docs consistency
         run: node scripts/check_docs.mjs
+      - name: Qwen curated example smoke
+        run: moon run examples/qwen_curated --target native --warn-list +73 --deny-warn
 
   test:
     name: Test
