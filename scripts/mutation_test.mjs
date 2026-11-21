@@ -34,8 +34,8 @@ const MUTATIONS = [
     id: "M03",
     name: "Qwen 回放前缀匹配失效",
     file: "qwen_adapter.mbt",
-    find: "if prompt == sample.dilemma || prompt.contains(sample.dilemma) {",
-    replace: "if prompt == sample.dilemma && prompt.contains(sample.dilemma) {",
+    find: "if prompt == kv.0 || prompt.contains(kv.0) {",
+    replace: "if prompt == kv.0 {",
     pkg: PKG,
   },
   {
@@ -120,6 +120,14 @@ const MUTATIONS = [
     file: "qwen_quality.mbt",
     find: "1.0 - seen.length().to_double() / total.to_double()",
     replace: "0.0",
+    pkg: PKG,
+  },
+  {
+    id: "M13",
+    name: "精选语料误用原始语料",
+    file: "qwen_adapter.mbt",
+    find: "QwenReplayLLM::with_samples(qwen_curated_samples,",
+    replace: "QwenReplayLLM::with_samples(qwen_samples,",
     pkg: PKG,
   },
 ];

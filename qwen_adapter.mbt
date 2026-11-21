@@ -53,13 +53,32 @@ pub fn QwenReplayLLM::new_strict() -> QwenReplayLLM {
 }
 
 ///|
-pub fn QwenReplayLLM::with_config(config : QwenConfig) -> QwenReplayLLM {
+/// 精选语料回放：24 条从 144 次评测中筛选的最佳响应，默认启用质量门槛。
+pub fn QwenReplayLLM::new_curated() -> QwenReplayLLM {
+  QwenReplayLLM::with_samples(qwen_curated_samples, {
+    max_response_chars: 120,
+    fallback: "先承认失败，再拆解问题，从最小可验证的一步重新开始。",
+    match_threshold: 0.3,
+    quality_gate: true,
+  })
+}
+
+///|
+fn build_response_map(samples : Array[QwenSample]) -> Map[String, String] {
   let responses : Map[String, String] = Map([])
-  for sample in qwen_samples {
+  for sample in samples {
     responses[sample.dilemma] = sample.response
   }
+  responses
+}
+
+///|
+fn QwenReplayLLM::with_samples(
+  samples : Array[QwenSample],
+  config : QwenConfig,
+) -> QwenReplayLLM {
   {
-    responses,
+    responses: build_response_map(samples),
     fallback: config.fallback,
     max_chars: config.max_response_chars,
     threshold: config.match_threshold,
@@ -67,6 +86,11 @@ pub fn QwenReplayLLM::with_config(config : QwenConfig) -> QwenReplayLLM {
     hits: 0,
     misses: 0,
   }
+}
+
+///|
+pub fn QwenReplayLLM::with_config(config : QwenConfig) -> QwenReplayLLM {
+  QwenReplayLLM::with_samples(qwen_samples, config)
 }
 
 ///|
@@ -160,7 +184,27 @@ pub fn qwen_response_for(prompt : String) -> String? {
 
 ///|
 fn QwenReplayLLM::response_for(self : QwenReplayLLM, prompt : String) -> String {
-  match qwen_response_for(prompt) {
+  let mut matched : String? = None
+  for kv in self.responses {
+    if prompt == kv.0 || prompt.contains(kv.0) {
+      matched = Some(kv.1)
+      break
+    }
+  }
+  if matched is None {
+    let mut best_score = 0.0
+    for kv in self.responses {
+      let score = qwen_match_score(prompt, kv.0)
+      if score > best_score {
+        best_score = score
+        matched = Some(kv.1)
+      }
+    }
+    if best_score < self.threshold {
+      matched = None
+    }
+  }
+  match matched {
     Some(response) => {
       let cleaned = qwen_clean_response(response, self.max_chars)
       if self.quality_gate && !qwen_is_acceptable(qwen_assess_response(cleaned)) {

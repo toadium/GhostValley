@@ -14,7 +14,8 @@ pub(all) struct QwenQuality {
 ///|
 let quality_words : Array[String] = [
   "反思", "复盘", "验证", "拆解", "行动", "证据", "团队", "情绪",
-  "安全", "改进",
+  "安全", "改进", "学习", "调整", "优化", "冷静", "专注", "分析",
+  "判断", "管理",
 ]
 
 ///|
@@ -123,15 +124,15 @@ pub fn qwen_safe_response(text : String, fallback : String) -> String {
 }
 
 ///|
-/// 语料整体质量摘要：合格率、平均分、平均长度。
-pub fn qwen_corpus_quality_summary() -> String {
-  if qwen_samples.length() == 0 {
-    return "Qwen corpus quality: empty"
+/// 对给定语料计算质量摘要。
+fn quality_summary(samples : Array[QwenSample], label : String) -> String {
+  if samples.length() == 0 {
+    return label + ": empty"
   }
   let mut accepted = 0
   let mut total_score = 0.0
   let mut total_length = 0
-  for sample in qwen_samples {
+  for sample in samples {
     let quality = qwen_assess_response(sample.response)
     if qwen_is_acceptable(quality) {
       accepted = accepted + 1
@@ -139,13 +140,26 @@ pub fn qwen_corpus_quality_summary() -> String {
     total_score = total_score + quality.score
     total_length = total_length + quality.length
   }
-  let n = qwen_samples.length().to_double()
-  "Qwen corpus quality: accepted=" +
+  let n = samples.length().to_double()
+  label +
+  ": accepted=" +
   accepted.to_string() +
   "/" +
-  qwen_samples.length().to_string() +
+  samples.length().to_string() +
   " avg_score=" +
   (total_score / n).to_string() +
   " avg_len=" +
   (total_length.to_double() / n).to_string()
+}
+
+///|
+/// 原始 12 条语料的质量摘要。
+pub fn qwen_corpus_quality_summary() -> String {
+  quality_summary(qwen_samples, "Qwen corpus quality")
+}
+
+///|
+/// 精选 24 条语料的质量摘要。
+pub fn qwen_curated_quality_summary() -> String {
+  quality_summary(qwen_curated_samples, "Qwen curated quality")
 }

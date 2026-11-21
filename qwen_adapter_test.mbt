@@ -27,9 +27,18 @@ test "qwen replay exact match" {
 
 ///|
 test "qwen replay prefix prompt" {
-  let llm = @ghostvalley.QwenReplayLLM::new()
-  let response = llm.generate_response("困境：你的工具突然不可用")
-  assert_true(response.length() > 0)
+  let llm = @ghostvalley.QwenReplayLLM::with_config({
+    max_response_chars: 120,
+    fallback: @ghostvalley.QwenConfig::default().fallback,
+    match_threshold: 1.0,
+    quality_gate: false,
+  })
+  let prompt = "前缀上下文：你的工具突然不可用"
+  let response = llm.generate_response(prompt)
+  match @ghostvalley.qwen_response_for("你的工具突然不可用") {
+    Some(expected) => assert_eq(response, expected)
+    None => fail("expected exact corpus match")
+  }
   let (hits, misses) = llm.stats()
   assert_eq(hits, 1)
   assert_eq(misses, 0)

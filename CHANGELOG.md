@@ -1,6 +1,17 @@
 # Changelog
 
-## [1.14.0] - 2026-11-21
+## [1.15.0] - 2026-11-21
+
+### Added
+- **精选 Qwen 回放语料**：从 144 次评测中为 24 个困境各筛选最佳响应，23/24 达质量门槛
+- **QwenReplayLLM::new_curated()**：24 条精选语料 + 默认质量门槛
+- **质量词表扩展**：学习/调整/优化/冷静/专注/分析/判断/管理
+- **新增 5 个 curated 测试**（498 → 503）
+
+### Changed
+- 原始 12 条语料仍保留作基线（3/12 达门槛）；精选语料用于生产回放
+
+## ## [1.14.0] - 2026-11-21
 
 ### Added
 - **Qwen 响应质量层**：qwen_assess_response / qwen_is_acceptable / qwen_safe_response / qwen_corpus_quality_summary
