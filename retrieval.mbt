@@ -45,7 +45,7 @@ pub fn GhostValleyEngine::search_memories(
 /// ```
 pub fn GhostValleyEngine::top_memories(
   self : GhostValleyEngine,
-  n : Int,
+  n : Int32,
 ) -> Array[AiMemory] {
   let bank = self.memory_bank
   if n <= 0 || bank.length() == 0 {
@@ -53,7 +53,7 @@ pub fn GhostValleyEngine::top_memories(
   }
   // Partial selection: maintain top-n with indices.
   // O(n * k) where k = top_n, better than O(n log n) when n >> k.
-  let top : Array[(AiMemory, Int)] = []
+  let top : Array[(AiMemory, Int32)] = []
   for i, m in bank {
     if top.length() < n {
       let mut inserted = false
@@ -64,7 +64,7 @@ pub fn GhostValleyEngine::top_memories(
           break
         }
       }
-      if not(inserted) {
+      if !inserted {
         top.push((m, i))
       }
     } else if m.value_score > top[top.length() - 1].0.value_score {
@@ -106,8 +106,8 @@ pub fn GhostValleyEngine::top_memories(
 /// ```
 pub fn GhostValleyEngine::filter_memories(
   self : GhostValleyEngine,
-  is_simulation? : Bool? = None,
-  is_core? : Bool? = None,
+  is_simulation~ : Bool? = None,
+  is_core~ : Bool? = None,
 ) -> Array[AiMemory] {
   let results : Array[AiMemory] = []
   for m in self.memory_bank {
@@ -198,14 +198,14 @@ pub fn GhostValleyEngine::core_memories(
 pub fn GhostValleyEngine::weighted_search(
   self : GhostValleyEngine,
   query : String,
-  top_n : Int,
+  top_n : Int32,
 ) -> Array[AiMemory] {
   let bank = self.memory_bank
   if bank.length() == 0 || top_n <= 0 {
     return []
   }
   // (composite_score, index)
-  let scored : Array[(Double, Int)] = []
+  let scored : Array[(Double, Int32)] = []
   let total = bank.length()
   for i, m in bank {
     let value_component = m.value_score * 0.4

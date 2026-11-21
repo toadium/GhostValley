@@ -30,27 +30,27 @@ pub fn GhostValleyEngine::load_memory(
   data : Json,
 ) -> Unit {
   match data {
-    Json::Array(items) => {
+    Array(items) => {
       self.memory_bank.clear()
       for item in items {
         match item {
-          Json::Object(obj) => {
+          Object(obj) => {
             let content_opt = match obj.get("content") {
-              Some(Json::String(s)) => Some(s)
+              Some(String(s)) => Some(s)
               _ => None
             }
             let score_opt = match obj.get("value_score") {
-              Some(Json::Number(n, ..)) => Some(n)
+              Some(Number(n, ..)) => Some(n)
               _ => None
             }
             let sim_opt = match obj.get("is_simulation") {
-              Some(Json::True) => Some(true)
-              Some(Json::False) => Some(false)
+              Some(True) => Some(true)
+              Some(False) => Some(false)
               _ => None
             }
             let core_opt = match obj.get("is_core_memory") {
-              Some(Json::True) => Some(true)
-              Some(Json::False) => Some(false)
+              Some(True) => Some(true)
+              Some(False) => Some(false)
               _ => None
             }
             match (content_opt, score_opt, sim_opt, core_opt) {
@@ -65,19 +65,19 @@ pub fn GhostValleyEngine::load_memory(
                 }
                 // 解析 access_count（默认 0，向后兼容）
                 let access_count = match obj.get("access_count") {
-                  Some(Json::Number(n, ..)) => n.to_int()
+                  Some(Number(n, ..)) => n.to_int()
                   _ => 0
                 }
                 // 解析 linked_ids（默认 []，向后兼容）
-                let linked_ids : Array[(Int, Double)] = []
+                let linked_ids : Array[(Int32, Double)] = []
                 match obj.get("linked_ids") {
-                  Some(Json::Array(links)) =>
+                  Some(Array(links)) =>
                     for link in links {
                       match link {
-                        Json::Array(pair) =>
+                        Array(pair) =>
                           if pair.length() >= 2 {
                             match (pair[0], pair[1]) {
-                              (Json::Number(idx, ..), Json::Number(str, ..)) =>
+                              (Number(idx, ..), Number(str, ..)) =>
                                 linked_ids.push((idx.to_int(), str))
                               _ => ()
                             }
@@ -87,7 +87,7 @@ pub fn GhostValleyEngine::load_memory(
                     }
                   _ => ()
                 }
-                self.memory_bank.push(AiMemory::{
+                self.memory_bank.push({
                   content: c,
                   value_score: clamped_score,
                   is_simulation: sim,
@@ -139,14 +139,15 @@ pub fn GhostValleyEngine::load_memory_string(
 ///
 /// 包含完整引擎状态：记忆库 + 训练日志 + 统计 + 配置 + 轮次。
 /// 用于跨会话保存/恢复训练进度。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct EngineState {
   memory_bank : Array[AiMemory]
   training_log : TrainingLog
   training_stats : TrainingStats
-  max_memory_num : Int
+  max_memory_num : Int32
   ghost_valley_enable : Bool
-  total_rounds : Int
-} derive(Debug, ToJson, FromJson)
+  total_rounds : Int32
+}
 
 ///|
 pub extend EngineState with @debug.Debug::{to_repr}
@@ -211,14 +212,14 @@ pub fn GhostValleyEngine::load_engine_state(
 ) -> Unit {
   try {
     let json = @json.parse(json_str)
-    let obj = json.as_object().unwrap()
+    let obj = json.object_opt().unwrap()
     // 恢复记忆
     self.memory_bank.clear()
-    let mem_arr = obj["memory_bank"].as_array().unwrap()
+    let mem_arr = obj["memory_bank"].array_opt().unwrap()
     for i in 0..<mem_arr.length() {
-      let m = mem_arr[i].as_object().unwrap()
+      let m = mem_arr[i].object_opt().unwrap()
       let score = {
-        let raw = m["value_score"].as_number().unwrap()
+        let raw = m["value_score"].number_opt().unwrap()
         if raw < 0.05 {
           0.05
         } else if raw > 0.95 {
@@ -228,18 +229,18 @@ pub fn GhostValleyEngine::load_engine_state(
         }
       }
       let access_count = match m.get("access_count") {
-        Some(Json::Number(n, ..)) => n.to_int()
+        Some(Number(n, ..)) => n.to_int()
         _ => 0
       }
-      let linked_ids : Array[(Int, Double)] = []
+      let linked_ids : Array[(Int32, Double)] = []
       match m.get("linked_ids") {
-        Some(Json::Array(links)) =>
+        Some(Array(links)) =>
           for link in links {
             match link {
-              Json::Array(pair) =>
+              Array(pair) =>
                 if pair.length() >= 2 {
                   match (pair[0], pair[1]) {
-                    (Json::Number(idx, ..), Json::Number(str, ..)) =>
+                    (Number(idx, ..), Number(str, ..)) =>
                       linked_ids.push((idx.to_int(), str))
                     _ => ()
                   }
@@ -249,68 +250,115 @@ pub fn GhostValleyEngine::load_engine_state(
           }
         _ => ()
       }
-      self.memory_bank.push(AiMemory::{
-        content: m["content"].as_string().unwrap(),
+      self.memory_bank.push({
+        content: m["content"].string_opt().unwrap(),
         value_score: score,
-        is_simulation: m["is_simulation"].as_bool().unwrap(),
-        is_core_memory: m["is_core_memory"].as_bool().unwrap(),
+        is_simulation: m["is_simulation"].bool_opt().unwrap(),
+        is_core_memory: m["is_core_memory"].bool_opt().unwrap(),
         access_count,
         linked_ids,
       })
     }
     // 恢复统计
-    let stats_obj = obj["training_stats"].as_object().unwrap()
+    let stats_obj = obj["training_stats"].object_opt().unwrap()
     self.training_stats.total_rounds_completed = stats_obj["total_rounds_completed"]
-      .as_number()
+      .number_opt()
       .unwrap()
       .to_int()
     self.training_stats.total_memories_added = stats_obj["total_memories_added"]
-      .as_number()
+      .number_opt()
       .unwrap()
       .to_int()
     self.training_stats.total_memories_cleaned = stats_obj["total_memories_cleaned"]
-      .as_number()
+      .number_opt()
       .unwrap()
       .to_int()
     self.training_stats.total_decay_applied = stats_obj["total_decay_applied"]
-      .as_number()
+      .number_opt()
       .unwrap()
       .to_int()
     self.training_stats.avg_score_history.clear()
-    let avg_arr = stats_obj["avg_score_history"].as_array().unwrap()
+    let avg_arr = stats_obj["avg_score_history"].array_opt().unwrap()
     for i in 0..<avg_arr.length() {
       self.training_stats.avg_score_history.push(
-        avg_arr[i].as_number().unwrap(),
+        avg_arr[i].number_opt().unwrap(),
       )
     }
     self.training_stats.memory_count_history.clear()
-    let mc_arr = stats_obj["memory_count_history"].as_array().unwrap()
+    let mc_arr = stats_obj["memory_count_history"].array_opt().unwrap()
     for i in 0..<mc_arr.length() {
       self.training_stats.memory_count_history.push(
-        mc_arr[i].as_number().unwrap().to_int(),
+        mc_arr[i].number_opt().unwrap().to_int(),
       )
     }
     // 恢复难度历史
     self.training_stats.round_difficulty_history.clear()
-    let diff_arr = stats_obj["round_difficulty_history"].as_array().unwrap()
+    let diff_arr = stats_obj["round_difficulty_history"].array_opt().unwrap()
     for i in 0..<diff_arr.length() {
       self.training_stats.round_difficulty_history.push(
-        diff_arr[i].as_number().unwrap().to_int(),
+        diff_arr[i].number_opt().unwrap().to_int(),
       )
     }
     // 恢复分类历史
     self.training_stats.round_category_history.clear()
-    let cat_arr = stats_obj["round_category_history"].as_array().unwrap()
+    let cat_arr = stats_obj["round_category_history"].array_opt().unwrap()
     for i in 0..<cat_arr.length() {
       self.training_stats.round_category_history.push(
-        cat_arr[i].as_string().unwrap(),
+        cat_arr[i].string_opt().unwrap(),
       )
     }
     // 恢复配置
-    self.max_memory_num = obj["max_memory_num"].as_number().unwrap().to_int()
-    self.ghost_valley_enable = obj["ghost_valley_enable"].as_bool().unwrap()
-    self.total_rounds = obj["total_rounds"].as_number().unwrap().to_int()
+    self.max_memory_num = obj["max_memory_num"].number_opt().unwrap().to_int()
+    self.ghost_valley_enable = obj["ghost_valley_enable"].bool_opt().unwrap()
+    self.total_rounds = obj["total_rounds"].number_opt().unwrap().to_int()
   } catch {
     _ => ()
+  }
+}
+
+///|
+fn Json::object_opt(self : Json) -> Map[String, Json]? {
+  if self is Object(obj) {
+    Some(obj)
+  } else {
+    None
+  }
+}
+
+///|
+fn Json::array_opt(self : Json) -> Array[Json]? {
+  if self is Array(arr) {
+    Some(arr)
+  } else {
+    None
+  }
+}
+
+///|
+fn Json::number_opt(self : Json) -> Double? {
+  if self is Number(n, ..) {
+    Some(n)
+  } else {
+    None
+  }
+}
+
+///|
+fn Json::string_opt(self : Json) -> String? {
+  if self is String(s) {
+    Some(s)
+  } else {
+    None
+  }
+}
+
+///|
+fn Json::bool_opt(self : Json) -> Bool? {
+  if self is True {
+    Some(true)
+  } else if self is False {
+    Some(false)
+  } else {
+    None
   }
 }

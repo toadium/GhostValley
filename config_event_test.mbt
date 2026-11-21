@@ -99,7 +99,7 @@ test "DecayModel: Hyperbolic 与原行为一致" {
   let gv = @ghostvalley.new_engine()
   gv.add_memory("普通记忆", is_simulation=false)
   let score_before = gv.memory_bank[0].value_score
-  gv.set_decay_model(@ghostvalley.Hyperbolic)
+  gv.set_decay_model(Hyperbolic)
   gv.apply_decay(10)
   let score_after = gv.memory_bank[0].value_score
   assert_true(score_after < score_before)
@@ -110,7 +110,7 @@ test "DecayModel: Linear 衰减" {
   let gv = @ghostvalley.new_engine()
   gv.add_memory("普通记忆", is_simulation=false)
   let score_before = gv.memory_bank[0].value_score
-  gv.set_decay_model(@ghostvalley.Linear)
+  gv.set_decay_model(Linear)
   gv.apply_decay(10)
   let score_after = gv.memory_bank[0].value_score
   // Linear: score * (1 - 10 * 0.02) = score * 0.8
@@ -124,7 +124,7 @@ test "DecayModel: Exponential 衰减" {
   let gv = @ghostvalley.new_engine()
   gv.add_memory("普通记忆", is_simulation=false)
   let score_before = gv.memory_bank[0].value_score
-  gv.set_decay_model(@ghostvalley.Exponential)
+  gv.set_decay_model(Exponential)
   gv.apply_decay(10)
   let score_after = gv.memory_bank[0].value_score
   // Exponential: score * 0.95^10
@@ -146,9 +146,9 @@ test "DecayModel: 不同模型产生不同结果" {
   gv1.memory_bank[0].value_score = 0.5
   gv2.memory_bank[0].value_score = 0.5
   gv3.memory_bank[0].value_score = 0.5
-  gv1.set_decay_model(@ghostvalley.Hyperbolic)
-  gv2.set_decay_model(@ghostvalley.Linear)
-  gv3.set_decay_model(@ghostvalley.Exponential)
+  gv1.set_decay_model(Hyperbolic)
+  gv2.set_decay_model(Linear)
+  gv3.set_decay_model(Exponential)
   gv1.apply_decay(20)
   gv2.apply_decay(20)
   gv3.apply_decay(20)
@@ -164,7 +164,7 @@ test "DecayModel: 核心记忆不受衰减影响" {
   let gv = @ghostvalley.new_engine()
   gv.add_memory("核心记忆", is_simulation=false, is_core=true)
   let score_before = gv.memory_bank[0].value_score
-  gv.set_decay_model(@ghostvalley.Linear)
+  gv.set_decay_model(Linear)
   gv.apply_decay(10)
   assert_eq(gv.memory_bank[0].value_score, score_before)
 }
@@ -268,7 +268,7 @@ test "DecayParams: 自定义参数" {
     exp_decay_base: 0.9,
   }
   gv.set_decay_params(params)
-  gv.set_decay_model(@ghostvalley.Linear)
+  gv.set_decay_model(Linear)
   gv.apply_decay(10)
   let score_after = gv.memory_bank[0].value_score
   // Linear: score * (1 - 10 * 0.05) = score * 0.5

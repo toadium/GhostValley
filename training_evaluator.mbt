@@ -6,11 +6,12 @@
 /// 分类覆盖情况
 ///
 /// 记录某个困境分类的训练轮次和占比。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct CategoryCoverage {
   category : String
-  rounds : Int
+  rounds : Int32
   percentage : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend CategoryCoverage with @debug.Debug::{to_repr}
@@ -25,14 +26,15 @@ pub extend CategoryCoverage with FromJson::{from_json}
 /// 综合训练评估报告
 ///
 /// 包含韧性分、分类覆盖度、改善率、总体评级。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct TrainingEvaluation {
   resilience_score : Double
   category_coverages : Array[CategoryCoverage]
   improvement_rate : Double
   overall_grade : String
-  total_rounds : Int
+  total_rounds : Int32
   avg_score : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend TrainingEvaluation with @debug.Debug::{to_repr}
@@ -150,11 +152,7 @@ pub fn GhostValleyEngine::category_coverage(
     } else {
       0.0
     }
-    result.push(CategoryCoverage::{
-      category: cat,
-      rounds: count,
-      percentage: pct,
-    })
+    result.push({ category: cat, rounds: count, percentage: pct, })
   }
   result
 }
@@ -268,7 +266,7 @@ pub fn GhostValleyEngine::evaluate_training(
   } else {
     "D"
   }
-  TrainingEvaluation::{
+  {
     resilience_score: resilience,
     category_coverages: coverages,
     improvement_rate: improvement,
@@ -281,7 +279,7 @@ pub fn GhostValleyEngine::evaluate_training(
 ///|
 /// 格式化训练评估报告
 pub fn TrainingEvaluation::format(self : TrainingEvaluation) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "======== 训练评估报告 ========\n"
   buf <+ "总体评级: \{self.overall_grade}\n"
   buf <+ "韧性分: \{self.resilience_score}\n"

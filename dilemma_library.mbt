@@ -20,12 +20,13 @@
 ///   assert_true(d.content.contains("50"))
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct DilemmaTemplate {
   template_text : String
   variables : Array[String]
   category : String
-  difficulty : Int
-} derive(Debug, ToJson, FromJson)
+  difficulty : Int32
+}
 
 ///|
 pub extend DilemmaTemplate with @debug.Debug::{to_repr}
@@ -40,10 +41,11 @@ pub extend DilemmaTemplate with FromJson::{from_json}
 /// 场景困境集合
 ///
 /// 一个业务场景下的所有困境模板，按难度分组。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct ScenarioDilemmas {
   scenario_name : String
   templates : Array[DilemmaTemplate]
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend ScenarioDilemmas with @debug.Debug::{to_repr}
@@ -68,9 +70,10 @@ pub extend ScenarioDilemmas with FromJson::{from_json}
 ///   assert_true(scenarios.length() >= 5)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct DilemmaLibrary {
   scenarios : Array[ScenarioDilemmas]
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend DilemmaLibrary with @debug.Debug::{to_repr}
@@ -86,11 +89,11 @@ pub extend DilemmaLibrary with FromJson::{from_json}
 pub fn DilemmaTemplate::new(
   template_text : String,
   category~ : String,
-  difficulty~ : Int,
+  difficulty~ : Int32,
 ) -> DilemmaTemplate {
   // 自动提取 {var} 格式的变量名
   let vars = extract_template_vars(template_text)
-  { template_text, variables: vars, category, difficulty }
+  { template_text, variables: vars, category, difficulty, }
 }
 
 ///|
@@ -104,8 +107,8 @@ pub fn DilemmaTemplate::instantiate(
 ) -> Dilemma {
   let mut result = self.template_text
   for pair in bindings {
-    let (var, val) = pair
-    let placeholder = "{" + var + "}"
+    let (name, val) = pair
+    let placeholder = "{" + name + "}"
     result = result.replace(old=placeholder, new=val)
   }
   Dilemma::new(result, category=self.category, difficulty=self.difficulty)
@@ -120,12 +123,12 @@ fn extract_template_vars(text : String) -> Array[String] {
   let chars = text.to_array()
   let mut i = 0
   let mut in_brace = false
-  let mut current = StringBuilder::new()
+  let mut current = StringBuilder()
   while i < chars.length() {
     let c = chars[i]
     if c == '{' {
       in_brace = true
-      current = StringBuilder::new()
+      current = StringBuilder()
     } else if c == '}' && in_brace {
       in_brace = false
       let name = current.to_string()
@@ -143,7 +146,7 @@ fn extract_template_vars(text : String) -> Array[String] {
 ///|
 /// 创建空场景库
 pub fn DilemmaLibrary::new() -> DilemmaLibrary {
-  { scenarios: [] }
+  { scenarios: [], }
 }
 
 ///|
@@ -169,7 +172,7 @@ pub fn DilemmaLibrary::register_scenario(
   name : String,
   templates : Array[DilemmaTemplate],
 ) -> Unit {
-  self.scenarios.push(ScenarioDilemmas::{ scenario_name: name, templates })
+  self.scenarios.push({ scenario_name: name, templates, })
 }
 
 ///|
@@ -189,7 +192,7 @@ pub fn DilemmaLibrary::list_scenarios(self : DilemmaLibrary) -> Array[String] {
 pub fn DilemmaLibrary::get_dilemmas(
   self : DilemmaLibrary,
   scenario : String,
-  difficulty : Int,
+  difficulty : Int32,
 ) -> Array[Dilemma] {
   let result : Array[Dilemma] = []
   for s in self.scenarios {
@@ -226,13 +229,13 @@ pub fn DilemmaLibrary::get_all_templates(
 
 ///|
 /// 场景数量
-pub fn DilemmaLibrary::scenario_count(self : DilemmaLibrary) -> Int {
+pub fn DilemmaLibrary::scenario_count(self : DilemmaLibrary) -> Int32 {
   self.scenarios.length()
 }
 
 ///|
 /// 总模板数
-pub fn DilemmaLibrary::total_templates(self : DilemmaLibrary) -> Int {
+pub fn DilemmaLibrary::total_templates(self : DilemmaLibrary) -> Int32 {
   let mut count = 0
   for s in self.scenarios {
     count = count + s.templates.length()
@@ -243,7 +246,7 @@ pub fn DilemmaLibrary::total_templates(self : DilemmaLibrary) -> Int {
 ///|
 /// 格式化场景库概览
 pub fn DilemmaLibrary::format(self : DilemmaLibrary) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("=== 困境场景库 ===\n")
   for s in self.scenarios {
     buf.write_string("【")

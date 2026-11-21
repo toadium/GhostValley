@@ -135,7 +135,7 @@ test "AuditLog::add_entry 添加条目" {
     action="training_start",
     actor="system",
     detail="开始训练",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   assert_eq(log.entry_count(), 1)
 }
@@ -148,21 +148,21 @@ test "AuditLog::query_by_action 按动作查询" {
     action="train",
     actor="sys",
     detail="a",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   log.add_entry(
     timestamp=2,
     action="violation",
     actor="sys",
     detail="b",
-    risk_level=@ghostvalley.High,
+    risk_level=High,
   )
   log.add_entry(
     timestamp=3,
     action="train",
     actor="sys",
     detail="c",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   let results = log.query_by_action("train")
   assert_eq(results.length(), 2)
@@ -176,23 +176,23 @@ test "AuditLog::query_by_risk 按风险查询" {
     action="a",
     actor="sys",
     detail="x",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   log.add_entry(
     timestamp=2,
     action="b",
     actor="sys",
     detail="y",
-    risk_level=@ghostvalley.Critical,
+    risk_level=Critical,
   )
   log.add_entry(
     timestamp=3,
     action="c",
     actor="sys",
     detail="z",
-    risk_level=@ghostvalley.Critical,
+    risk_level=Critical,
   )
-  let results = log.query_by_risk(@ghostvalley.Critical)
+  let results = log.query_by_risk(Critical)
   assert_eq(results.length(), 2)
 }
 
@@ -204,7 +204,7 @@ test "AuditLog::export_csv 导出CSV" {
     action="train",
     actor="sys",
     detail="开始",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   let csv = log.export_csv()
   assert_true(csv.contains("timestamp"))
@@ -255,8 +255,8 @@ test "TrainingProtocol::format 输出协议信息" {
 
 ///|
 test "RiskLevel 相等比较" {
-  assert_true(@ghostvalley.Low == @ghostvalley.Low)
-  assert_true(@ghostvalley.Critical != @ghostvalley.Low)
+  assert_true(@ghostvalley.Low == Low)
+  assert_true(@ghostvalley.Critical != Low)
 }
 
 ///|

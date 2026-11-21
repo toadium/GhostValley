@@ -6,6 +6,7 @@
 /// 对比训练结果
 ///
 /// 记录同一困境下两个 LLM 的响应对比。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct ComparativeResult {
   dilemma : String
   response_a : String
@@ -14,7 +15,7 @@ pub(all) struct ComparativeResult {
   score_b : Double
   similarity_score : Double
   winner : String
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend ComparativeResult with @debug.Debug::{to_repr}
@@ -86,7 +87,7 @@ pub fn[T : LLMAdapter, U : LLMAdapter] GhostValleyEngine::run_comparative_round(
   } else {
     "tie"
   }
-  ComparativeResult::{
+  {
     dilemma: dilemma.content,
     response_a,
     response_b,
@@ -117,7 +118,7 @@ pub fn[T : LLMAdapter, U : LLMAdapter] GhostValleyEngine::run_comparative_pipeli
   self : GhostValleyEngine,
   llm_a : T,
   llm_b : U,
-  rounds~ : Int,
+  rounds~ : Int32,
 ) -> Array[ComparativeResult] {
   if !self.ghost_valley_enable || rounds <= 0 {
     return []
@@ -156,8 +157,8 @@ pub fn[T : LLMAdapter, U : LLMAdapter] GhostValleyEngine::run_comparative_pipeli
 pub fn cross_pollinate(
   target : GhostValleyEngine,
   source : GhostValleyEngine,
-  top_n~ : Int,
-) -> Int {
+  top_n~ : Int32,
+) -> Int32 {
   let top = source.top_memories(top_n)
   let mut count = 0
   for m in top {
@@ -188,7 +189,7 @@ pub(all) struct MultiAgentSession {
 ///|
 /// 创建空的多智能体会话
 pub fn MultiAgentSession::new() -> MultiAgentSession {
-  { agents: [] }
+  { agents: [], }
 }
 
 ///|
@@ -203,7 +204,7 @@ pub fn MultiAgentSession::add_agent(
 
 ///|
 /// 智能体数量
-pub fn MultiAgentSession::agent_count(self : MultiAgentSession) -> Int {
+pub fn MultiAgentSession::agent_count(self : MultiAgentSession) -> Int32 {
   self.agents.length()
 }
 
@@ -242,9 +243,9 @@ pub fn MultiAgentSession::agent_names(
 /// 返回每个智能体导入的记忆总数。
 pub fn MultiAgentSession::cross_learn_all(
   self : MultiAgentSession,
-  top_n~ : Int,
-) -> Array[(String, Int)] {
-  let results : Array[(String, Int)] = []
+  top_n~ : Int32,
+) -> Array[(String, Int32)] {
+  let results : Array[(String, Int32)] = []
   for i in 0..<self.agents.length() {
     let (name, engine) = self.agents[i]
     let mut total_imported = 0
@@ -263,7 +264,7 @@ pub fn MultiAgentSession::cross_learn_all(
 ///|
 /// 格式化对比结果
 pub fn ComparativeResult::format(self : ComparativeResult) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "困境: \{self.dilemma}\n"
   buf <+ "  A 响应: \{self.response_a} (分数: \{self.score_a})\n"
   buf <+ "  B 响应: \{self.response_b} (分数: \{self.score_b})\n"

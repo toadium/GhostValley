@@ -6,13 +6,14 @@
 /// 训练事件类型
 ///
 /// 训练管道中各关键节点自动记录事件。
+#derive(Debug, Eq, ToJson, FromJson)
 pub(all) enum TrainingEvent {
   MemoryAdded
   MemoryForgotten
   DecayApplied
   CleanupDone
   RoundCompleted
-} derive(Debug, Eq, ToJson, FromJson)
+}
 
 ///|
 pub extend TrainingEvent with @debug.Debug::{to_repr}
@@ -28,11 +29,12 @@ pub extend TrainingEvent with FromJson::{from_json}
 
 ///|
 /// 事件记录
+#derive(Debug, ToJson, FromJson)
 pub(all) struct EventRecord {
   event : String
-  round : Int
+  round : Int32
   detail : String
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend EventRecord with @debug.Debug::{to_repr}
@@ -50,13 +52,13 @@ pub extend EventRecord with FromJson::{from_json}
 /// 事件日志可导出为 JSON，回调不参与序列化。
 pub(all) struct EventSystem {
   mut event_log : Array[EventRecord]
-  mut callbacks : Array[(String, (String, Int) -> Unit)]
+  mut callbacks : Array[(String, (String, Int32) -> Unit)]
 }
 
 ///|
 /// 创建空的事件系统
 pub fn EventSystem::new() -> EventSystem {
-  { event_log: [], callbacks: [] }
+  { event_log: [], callbacks: [], }
 }
 
 ///|
@@ -67,7 +69,7 @@ pub fn EventSystem::new() -> EventSystem {
 pub fn EventSystem::register_callback(
   self : EventSystem,
   event_type : String,
-  handler : (String, Int) -> Unit,
+  handler : (String, Int32) -> Unit,
 ) -> Unit {
   self.callbacks.push((event_type, handler))
 }
@@ -79,10 +81,10 @@ pub fn EventSystem::register_callback(
 pub fn EventSystem::emit(
   self : EventSystem,
   event_type : String,
-  round : Int,
+  round : Int32,
   detail : String,
 ) -> Unit {
-  self.event_log.push(EventRecord::{ event: event_type, round, detail })
+  self.event_log.push({ event: event_type, round, detail, })
   for cb in self.callbacks {
     let (etype, handler) = cb
     if etype == event_type {
@@ -99,7 +101,10 @@ pub fn EventSystem::get_log(self : EventSystem) -> Array[EventRecord] {
 
 ///|
 /// 统计指定类型事件数量
-pub fn EventSystem::event_count(self : EventSystem, event_type : String) -> Int {
+pub fn EventSystem::event_count(
+  self : EventSystem,
+  event_type : String,
+) -> Int32 {
   let mut count = 0
   for r in self.event_log {
     if r.event == event_type {

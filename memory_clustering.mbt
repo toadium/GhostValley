@@ -24,13 +24,13 @@
 pub fn GhostValleyEngine::cluster_memories(
   self : GhostValleyEngine,
   similarity_threshold : Double,
-) -> Array[Array[Int]] {
+) -> Array[Array[Int32]] {
   let bank = self.memory_bank
   if bank.length() == 0 {
     return []
   }
   // 每个簇: (代表记忆索引, 簇内索引列表)
-  let clusters : Array[(Int, Array[Int])] = []
+  let clusters : Array[(Int32, Array[Int32])] = []
   for i in 0..<bank.length() {
     let mut assigned = false
     for c in 0..<clusters.length() {
@@ -42,11 +42,11 @@ pub fn GhostValleyEngine::cluster_memories(
         break
       }
     }
-    if not(assigned) {
+    if !assigned {
       clusters.push((i, [i]))
     }
   }
-  let result : Array[Array[Int]] = []
+  let result : Array[Array[Int32]] = []
   for c in clusters {
     let (_, members) = c
     result.push(members)
@@ -75,7 +75,7 @@ pub fn GhostValleyEngine::auto_link(
   self : GhostValleyEngine,
   similarity_threshold : Double,
   strength~ : Double,
-) -> Int {
+) -> Int32 {
   let bank = self.memory_bank
   let mut link_count = 0
   for i in 0..<bank.length() {
@@ -91,7 +91,7 @@ pub fn GhostValleyEngine::auto_link(
             break
           }
         }
-        if not(already_linked) {
+        if !already_linked {
           self.link_memories(i, j, strength~)
           link_count = link_count + 1
         }
@@ -105,13 +105,14 @@ pub fn GhostValleyEngine::auto_link(
 /// 簇摘要
 ///
 /// 记录单个聚类的统计信息。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct ClusterSummary {
-  cluster_id : Int
-  size : Int
+  cluster_id : Int32
+  size : Int32
   avg_score : Double
   representative_content : String
-  member_indices : Array[Int]
-} derive(Debug, ToJson, FromJson)
+  member_indices : Array[Int32]
+}
 
 ///|
 pub extend ClusterSummary with @debug.Debug::{to_repr}
@@ -164,7 +165,7 @@ pub fn GhostValleyEngine::cluster_statistics(
         rep_idx = idx
       }
     }
-    summaries.push(ClusterSummary::{
+    summaries.push({
       cluster_id: i,
       size: members.length(),
       avg_score: avg,
@@ -199,7 +200,7 @@ pub fn GhostValleyEngine::cluster_statistics(
 /// ```
 pub fn GhostValleyEngine::adaptive_reinforce(
   self : GhostValleyEngine,
-  idx : Int,
+  idx : Int32,
 ) -> Unit {
   let bank = self.memory_bank
   if idx < 0 || idx >= bank.length() {
@@ -215,7 +216,7 @@ pub fn GhostValleyEngine::adaptive_reinforce(
 ///|
 /// 格式化簇摘要
 pub fn ClusterSummary::format(self : ClusterSummary) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+
     "簇 #\{self.cluster_id}: \{self.size} 条记忆, 平均分 \{self.avg_score}\n"
   buf <+ "  代表: \{self.representative_content}\n"

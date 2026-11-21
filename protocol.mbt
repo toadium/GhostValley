@@ -19,12 +19,13 @@
 ///   assert_true(p.max_stress_level > 0.0)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct TrainingProtocol {
   max_stress_level : Double
   min_confidence : Double
-  max_rounds_without_improvement : Int
-  cooldown_rounds : Int
-} derive(Debug, ToJson, FromJson)
+  max_rounds_without_improvement : Int32
+  cooldown_rounds : Int32
+}
 
 ///|
 pub extend TrainingProtocol with @debug.Debug::{to_repr}
@@ -39,13 +40,14 @@ pub extend TrainingProtocol with FromJson::{from_json}
 /// 协议违反
 ///
 /// 记录一次安全协议违反的详情。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct ProtocolViolation {
   violation_type : String
   severity : String // "critical" | "warning" | "info"
   message : String
   current_value : Double
   threshold : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend ProtocolViolation with @debug.Debug::{to_repr}
@@ -58,12 +60,13 @@ pub extend ProtocolViolation with FromJson::{from_json}
 
 ///|
 /// 风险等级
+#derive(Debug, Eq, ToJson, FromJson)
 pub(all) enum RiskLevel {
   Low
   Medium
   High
   Critical
-} derive(Debug, Eq, ToJson, FromJson)
+}
 
 ///|
 pub extend RiskLevel with @debug.Debug::{to_repr}
@@ -81,13 +84,14 @@ pub extend RiskLevel with FromJson::{from_json}
 /// 审计日志条目
 ///
 /// 记录一次可审计的操作。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct AuditEntry {
-  timestamp : Int
+  timestamp : Int32
   action : String
   actor : String
   detail : String
   risk_level : RiskLevel
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend AuditEntry with @debug.Debug::{to_repr}
@@ -112,15 +116,16 @@ pub extend AuditEntry with FromJson::{from_json}
 ///     action="training_start",
 ///     actor="system",
 ///     detail="开始训练",
-///     risk_level=@ghostvalley.Low,
+///     risk_level=Low,
 ///   )
 ///   assert_eq(log.entry_count(), 1)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct AuditLog {
   mut entries : Array[AuditEntry]
-  mut current_timestamp : Int
-} derive(Debug, ToJson, FromJson)
+  mut current_timestamp : Int32
+}
 
 ///|
 pub extend AuditLog with @debug.Debug::{to_repr}
@@ -163,12 +168,12 @@ pub fn TrainingProtocol::strict() -> TrainingProtocol {
 pub fn protocol_check(
   protocol : TrainingProtocol,
   emotion : EmotionState,
-  rounds_without_improvement : Int,
+  rounds_without_improvement : Int32,
 ) -> Array[ProtocolViolation] {
   let violations : Array[ProtocolViolation] = []
   // 检查压力超限
   if emotion.stress_level > protocol.max_stress_level {
-    violations.push(ProtocolViolation::{
+    violations.push({
       violation_type: "stress_exceeded",
       severity: "critical",
       message: "压力水平超过安全上限",
@@ -178,7 +183,7 @@ pub fn protocol_check(
   }
   // 检查信心过低
   if emotion.confidence < protocol.min_confidence {
-    violations.push(ProtocolViolation::{
+    violations.push({
       violation_type: "confidence_too_low",
       severity: "critical",
       message: "信心水平低于安全下限",
@@ -188,7 +193,7 @@ pub fn protocol_check(
   }
   // 检查连续无改善
   if rounds_without_improvement > protocol.max_rounds_without_improvement {
-    violations.push(ProtocolViolation::{
+    violations.push({
       violation_type: "no_improvement",
       severity: "warning",
       message: "连续无改善轮次超过容忍上限",
@@ -198,7 +203,7 @@ pub fn protocol_check(
   }
   // 检查崩溃
   if emotion.is_breakdown() {
-    violations.push(ProtocolViolation::{
+    violations.push({
       violation_type: "breakdown",
       severity: "critical",
       message: "AI 处于压力崩溃状态",
@@ -225,26 +230,26 @@ pub fn needs_cooldown(violations : Array[ProtocolViolation]) -> Bool {
 ///|
 /// 创建空审计日志
 pub fn AuditLog::new() -> AuditLog {
-  { entries: [], current_timestamp: 0 }
+  { entries: [], current_timestamp: 0, }
 }
 
 ///|
 /// 添加审计条目
 pub fn AuditLog::add_entry(
   self : AuditLog,
-  timestamp~ : Int,
+  timestamp~ : Int32,
   action~ : String,
   actor~ : String,
   detail~ : String,
   risk_level~ : RiskLevel,
 ) -> Unit {
   self.current_timestamp = timestamp
-  self.entries.push(AuditEntry::{ timestamp, action, actor, detail, risk_level })
+  self.entries.push({ timestamp, action, actor, detail, risk_level, })
 }
 
 ///|
 /// 审计条目数量
-pub fn AuditLog::entry_count(self : AuditLog) -> Int {
+pub fn AuditLog::entry_count(self : AuditLog) -> Int32 {
   self.entries.length()
 }
 
@@ -281,7 +286,7 @@ pub fn AuditLog::query_by_risk(
 ///|
 /// 导出审计日志为 CSV
 pub fn AuditLog::export_csv(self : AuditLog) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("timestamp,action,actor,detail,risk_level\n")
   for e in self.entries {
     buf.write_string(e.timestamp.to_string())
@@ -317,9 +322,9 @@ fn risk_level_to_string(risk : RiskLevel) -> String {
 pub fn enforce_protocol(
   protocol : TrainingProtocol,
   emotion : EmotionState,
-  rounds_without_improvement : Int,
+  rounds_without_improvement : Int32,
   audit_log : AuditLog,
-  current_round : Int,
+  current_round : Int32,
 ) -> Bool {
   let violations = protocol_check(protocol, emotion, rounds_without_improvement)
   if violations.length() == 0 {
@@ -343,7 +348,7 @@ pub fn enforce_protocol(
     )
   }
   // 需要冷却则返回 false
-  not(needs_cooldown(violations))
+  !needs_cooldown(violations)
 }
 
 ///|
@@ -355,7 +360,7 @@ pub fn cooldown_period(
   protocol : TrainingProtocol,
   emotion : EmotionState,
   audit_log : AuditLog,
-  start_round : Int,
+  start_round : Int32,
 ) -> Unit {
   audit_log.add_entry(
     timestamp=start_round,
@@ -380,7 +385,7 @@ pub fn cooldown_period(
 ///|
 /// 格式化协议为可读字符串
 pub fn TrainingProtocol::format(self : TrainingProtocol) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("=== 训练安全协议 ===\n")
   buf.write_string("最大压力水平: ")
   buf.write_string(self.max_stress_level.to_string())

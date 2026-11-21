@@ -44,10 +44,7 @@ test "generate_ascii_chart 递减序列" {
 ///|
 test "generate_ascii_bar 基本柱状图" {
   let chart = @ghostvalley.generate_ascii_bar(
-    [
-      @ghostvalley.BarItem::{ label: "认知", value: 0.8 },
-      @ghostvalley.BarItem::{ label: "情感", value: 0.5 },
-    ],
+    [{ label: "认知", value: 0.8, }, { label: "情感", value: 0.5, }],
     title="分类覆盖度",
   )
   assert_true(chart.contains("分类覆盖度"))
@@ -65,7 +62,7 @@ test "generate_ascii_bar 空数据" {
 ///|
 test "generate_ascii_bar 零值" {
   let chart = @ghostvalley.generate_ascii_bar(
-    [@ghostvalley.BarItem::{ label: "测试", value: 0.0 }],
+    [{ label: "测试", value: 0.0, }],
     title="零值",
   )
   assert_true(chart.contains("测试"))
@@ -74,7 +71,7 @@ test "generate_ascii_bar 零值" {
 ///|
 test "generate_ascii_bar 满值" {
   let chart = @ghostvalley.generate_ascii_bar(
-    [@ghostvalley.BarItem::{ label: "满分", value: 1.0 }],
+    [{ label: "满分", value: 1.0, }],
     title="满值",
   )
   assert_true(chart.contains("满分"))
@@ -160,7 +157,7 @@ test "export_full_report_markdown 空训练" {
 
 ///|
 test "BarItem 序列化" {
-  let item = @ghostvalley.BarItem::{ label: "测试", value: 0.5 }
+  let item = @ghostvalley.BarItem::{ label: "测试", value: 0.5, }
   let json = @json.to_json(item)
   let str = json.stringify()
   assert_true(str.contains("测试"))

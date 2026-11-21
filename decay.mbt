@@ -18,7 +18,7 @@
 /// ```
 pub fn GhostValleyEngine::apply_decay(
   self : GhostValleyEngine,
-  rounds_elapsed : Int,
+  rounds_elapsed : Int32,
 ) -> Unit {
   if rounds_elapsed <= 0 {
     return
@@ -52,9 +52,9 @@ pub fn GhostValleyEngine::apply_decay(
 pub fn GhostValleyEngine::cleanup_low_value(
   self : GhostValleyEngine,
   threshold : Double,
-) -> Int {
+) -> Int32 {
   let bank = self.memory_bank
-  let indices_to_remove : Array[Int] = []
+  let indices_to_remove : Array[Int32] = []
   for i, m in bank {
     if !m.is_core_memory && m.value_score < threshold {
       indices_to_remove.push(i)

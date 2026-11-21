@@ -6,14 +6,15 @@
 /// - `value_score`：自我打分（0~1），越高越有用，主动遗忘靠这个分数
 /// - `is_simulation`：安全气垫标记，True=这是模拟虚假挫折，不是真实世界信息
 /// - `is_core_memory`：是否永久核心记忆，不会被主动遗忘清理
+#derive(Debug, Eq, ToJson, FromJson)
 pub(all) struct AiMemory {
   content : String
   mut value_score : Double
   is_simulation : Bool
   is_core_memory : Bool
-  mut access_count : Int
-  mut linked_ids : Array[(Int, Double)]
-} derive(Debug, Eq, ToJson, FromJson)
+  mut access_count : Int32
+  mut linked_ids : Array[(Int32, Double)]
+}
 
 ///|
 pub extend AiMemory with @debug.Debug::{to_repr}
@@ -37,11 +38,11 @@ pub extend AiMemory with ToJson::{to_json}
 /// 4. 第八根空桩
 /// 5. 建造者退场逻辑
 pub(all) struct GhostValleyEngine {
-  mut max_memory_num : Int
+  mut max_memory_num : Int32
   memory_bank : Array[AiMemory]
   mut ghost_valley_enable : Bool
   mut wen_shi_willing_score : Double
-  mut total_rounds : Int
+  mut total_rounds : Int32
   empty_stake_dilemma_pool : Array[String]
   mut structured_dilemma_pool : Array[Dilemma]
   training_log : TrainingLog
@@ -66,7 +67,7 @@ pub(all) struct GhostValleyEngine {
 ///   inspect(gv.memory_bank.length(), content="0")
 /// }
 /// ```
-pub fn new_engine(max_memory_num? : Int = 12) -> GhostValleyEngine {
+pub fn new_engine(max_memory_num~ : Int32 = 12) -> GhostValleyEngine {
   {
     max_memory_num,
     memory_bank: [],
@@ -171,7 +172,7 @@ pub fn GhostValleyEngine::active_forget(self : GhostValleyEngine) -> Unit {
   if bank.length() <= threshold {
     return
   }
-  let non_core_indices : Array[(Int, Double)] = []
+  let non_core_indices : Array[(Int32, Double)] = []
   for i, m in bank {
     if !m.is_core_memory {
       non_core_indices.push((i, m.value_score))
@@ -181,7 +182,7 @@ pub fn GhostValleyEngine::active_forget(self : GhostValleyEngine) -> Unit {
   let raw_count = non_core_indices.length() * 3 / 10
   // 确保触发遗忘时至少删除 1 条非核心记忆
   let remove_count = if raw_count >= 1 { raw_count } else { 1 }
-  let indices_to_remove : Array[Int] = []
+  let indices_to_remove : Array[Int32] = []
   for i in 0..<remove_count {
     if i < non_core_indices.length() {
       indices_to_remove.push(non_core_indices[i].0)
@@ -205,7 +206,7 @@ pub fn GhostValleyEngine::add_memory(
   self : GhostValleyEngine,
   content : String,
   is_simulation~ : Bool,
-  is_core? : Bool = false,
+  is_core~ : Bool = false,
 ) -> Unit {
   let base_score = configurable_text_value_score(content, self.scoring_config)
   let noise = (self.rng.double() - 0.5) * 0.1
@@ -281,7 +282,7 @@ pub fn GhostValleyEngine::ghost_valley_run_one_round(
 /// ```
 pub fn GhostValleyEngine::ghost_valley_run_rounds(
   self : GhostValleyEngine,
-  n : Int,
+  n : Int32,
 ) -> Array[String?] {
   let results : Array[String?] = []
   for _ in 0..<n {
@@ -317,7 +318,7 @@ pub fn GhostValleyEngine::close_ghost_valley(self : GhostValleyEngine) -> Unit {
 ///
 /// 对应 Python 原版的 `show_all_memory`，但返回字符串而非直接打印。
 pub fn GhostValleyEngine::show_all_memory(self : GhostValleyEngine) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("======== 当前全部记忆库 ========\n")
   for idx, m in self.memory_bank {
     let tag_sim = if m.is_simulation {
@@ -343,7 +344,7 @@ pub fn GhostValleyEngine::show_all_memory(self : GhostValleyEngine) -> String {
 
 ///|
 /// 获取当前记忆数量
-pub fn GhostValleyEngine::memory_count(self : GhostValleyEngine) -> Int {
+pub fn GhostValleyEngine::memory_count(self : GhostValleyEngine) -> Int32 {
   self.memory_bank.length()
 }
 
@@ -404,7 +405,7 @@ pub fn GhostValleyEngine::set_dilemma_pool(
 
 ///|
 /// 获取当前困境池大小
-pub fn GhostValleyEngine::dilemma_pool_size(self : GhostValleyEngine) -> Int {
+pub fn GhostValleyEngine::dilemma_pool_size(self : GhostValleyEngine) -> Int32 {
   self.empty_stake_dilemma_pool.length()
 }
 
@@ -450,8 +451,8 @@ pub fn GhostValleyEngine::add_memory_dedup(
   self : GhostValleyEngine,
   content : String,
   is_simulation~ : Bool,
-  is_core? : Bool = false,
-  similarity_threshold? : Double = 0.8,
+  is_core~ : Bool = false,
+  similarity_threshold~ : Double = 0.8,
 ) -> Bool {
   let bank = self.memory_bank
   // 查找最相似的已有记忆
@@ -479,7 +480,7 @@ pub fn GhostValleyEngine::add_memory_dedup(
     } else {
       merged_score
     }
-    bank[best_idx] = AiMemory::{
+    bank[best_idx] = {
       content: existing.content + " | " + content,
       value_score: clamped,
       is_simulation: existing.is_simulation || is_simulation,
@@ -513,8 +514,8 @@ pub fn GhostValleyEngine::add_memory_dedup(
 /// ```
 pub fn GhostValleyEngine::merge_memories(
   self : GhostValleyEngine,
-  idx_a : Int,
-  idx_b : Int,
+  idx_a : Int32,
+  idx_b : Int32,
 ) -> Unit {
   let bank = self.memory_bank
   if idx_a < 0 || idx_b < 0 || idx_a == idx_b {
@@ -532,14 +533,14 @@ pub fn GhostValleyEngine::merge_memories(
   } else {
     mem_b.value_score
   }
-  bank[lo] = AiMemory::{
+  bank[lo] = {
     content: mem_a.content + " | " + mem_b.content,
     value_score: merged_score,
     is_simulation: mem_a.is_simulation || mem_b.is_simulation,
     is_core_memory: mem_a.is_core_memory || mem_b.is_core_memory,
     access_count: mem_a.access_count + mem_b.access_count,
     linked_ids: {
-      let merged : Array[(Int, Double)] = []
+      let merged : Array[(Int32, Double)] = []
       for link in mem_a.linked_ids {
         merged.push(link)
       }
@@ -578,9 +579,9 @@ pub fn GhostValleyEngine::merge_memories(
 pub fn[T : LLMAdapter] GhostValleyEngine::run_training_pipeline(
   self : GhostValleyEngine,
   llm : T,
-  rounds~ : Int,
-  decay_interval? : Int = 5,
-  cleanup_threshold? : Double = 0.1,
+  rounds~ : Int32,
+  decay_interval~ : Int32 = 5,
+  cleanup_threshold~ : Double = 0.1,
 ) -> Unit {
   if !self.ghost_valley_enable || rounds <= 0 {
     return
@@ -713,7 +714,7 @@ pub fn GhostValleyEngine::get_event_system(
 pub fn GhostValleyEngine::register_callback(
   self : GhostValleyEngine,
   event_type : String,
-  handler : (String, Int) -> Unit,
+  handler : (String, Int32) -> Unit,
 ) -> Unit {
   self.event_system.register_callback(event_type, handler)
 }
@@ -731,6 +732,6 @@ pub fn GhostValleyEngine::get_event_log(
 pub fn GhostValleyEngine::event_count(
   self : GhostValleyEngine,
   event_type : String,
-) -> Int {
+) -> Int32 {
   self.event_system.event_count(event_type)
 }

@@ -1,6 +1,10 @@
 # MoonBit build output
 _build/
 
+# Temporary verification artifacts
+.tmp/
+coverage.txt
+
 # IDE
 .vscode/
 .idea/

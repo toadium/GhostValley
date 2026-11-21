@@ -28,31 +28,31 @@ fn main {
   let lib = @ghostvalley.DilemmaLibrary::new()
   // 注册自定义场景：新员工入职
   let onboarding_templates : Array[@ghostvalley.DilemmaTemplate] = [
-    @ghostvalley.DilemmaTemplate::{
+    {
       template_text: "你刚入职第一天，面对完全陌生的办公环境，不知道该找谁报到",
       variables: [],
       category: "emotional",
       difficulty: 1,
     },
-    @ghostvalley.DilemmaTemplate::{
+    {
       template_text: "你在试用期内犯了一个低级错误，被同事当面指出",
       variables: [],
       category: "emotional",
       difficulty: 2,
     },
-    @ghostvalley.DilemmaTemplate::{
+    {
       template_text: "你的直属上级在团队会议上质疑你的专业能力，所有人都在看着你",
       variables: [],
       category: "social",
       difficulty: 3,
     },
-    @ghostvalley.DilemmaTemplate::{
+    {
       template_text: "你提交的第一个方案被全盘否定，你需要在一周内重新提交",
       variables: [],
       category: "cognitive",
       difficulty: 2,
     },
-    @ghostvalley.DilemmaTemplate::{
+    {
       template_text: "你发现团队的一个长期做法有问题，但所有前辈都习以为常",
       variables: [],
       category: "social",
@@ -186,28 +186,28 @@ fn main {
     action="onboarding_start",
     actor="new_employee_ai",
     detail="新员工入职心理建设训练开始",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   audit.add_entry(
     timestamp=5,
     action="phase1_complete",
     actor="training_pipeline",
     detail="基础适应阶段完成",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   audit.add_entry(
     timestamp=13,
     action="phase2_complete",
     actor="training_pipeline",
     detail="中级挑战阶段完成",
-    risk_level=@ghostvalley.Medium,
+    risk_level=Medium,
   )
   audit.add_entry(
     timestamp=18,
     action="onboarding_complete",
     actor="new_employee_ai",
     detail="入职心理建设训练全部完成",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   println("  审计条目数: \{audit.entry_count()}")
   let csv = audit.export_csv()
@@ -234,7 +234,7 @@ fn main {
 
   // ========== 10. 权重检索 + 训练总结 ==========
   println("【10】权重检索 + 训练总结")
-  let by_value = gv.weighted_retrieve(5, @ghostvalley.Value)
+  let by_value = gv.weighted_retrieve(5, Value)
   println("  按价值检索 Top 5:")
   for i, m in by_value {
     let preview = if m.content.length() > 40 { 40 } else { m.content.length() }

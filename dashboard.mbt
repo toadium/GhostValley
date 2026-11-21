@@ -4,10 +4,11 @@
 
 ///|
 /// 柱状图数据项
+#derive(Debug, ToJson, FromJson)
 pub(all) struct BarItem {
   label : String
   value : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend BarItem with @debug.Debug::{to_repr}
@@ -22,12 +23,13 @@ pub extend BarItem with FromJson::{from_json}
 /// 训练仪表盘
 ///
 /// 整合训练全程的可视化信息。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct TrainingDashboard {
   score_chart : String
   category_chart : String
   memory_distribution : String
   summary : String
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend TrainingDashboard with @debug.Debug::{to_repr}
@@ -55,7 +57,7 @@ pub extend TrainingDashboard with FromJson::{from_json}
 /// }
 /// ```
 pub fn generate_ascii_chart(scores : Array[Double], title~ : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("┌─ ")
   buf.write_string(title)
   buf.write_string(" ─┐\n")
@@ -156,17 +158,14 @@ pub fn generate_ascii_chart(scores : Array[Double], title~ : String) -> String {
 /// ```mbt check
 /// test {
 ///   let chart = @ghostvalley.generate_ascii_bar(
-///     [
-///       @ghostvalley.BarItem::{ label: "认知", value: 0.8 },
-///       @ghostvalley.BarItem::{ label: "情感", value: 0.5 },
-///     ],
+///     [{ label: "认知", value: 0.8, }, { label: "情感", value: 0.5, }],
 ///     title="分类覆盖度",
 ///   )
 ///   assert_true(chart.contains("分类覆盖度"))
 /// }
 /// ```
 pub fn generate_ascii_bar(data : Array[BarItem], title~ : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("┌─ ")
   buf.write_string(title)
   buf.write_string(" ─┐\n")
@@ -228,7 +227,7 @@ pub fn GhostValleyEngine::render_dashboard(
   let eval = self.evaluate_training()
   let bars : Array[BarItem] = []
   for cov in eval.category_coverages {
-    bars.push(BarItem::{ label: cov.category, value: cov.percentage })
+    bars.push({ label: cov.category, value: cov.percentage, })
   }
   let category_chart = generate_ascii_bar(bars, title="分类覆盖度")
   // 记忆分布
@@ -245,7 +244,7 @@ pub fn GhostValleyEngine::render_dashboard(
       real_count = real_count + 1
     }
   }
-  let mem_buf = StringBuilder::new()
+  let mem_buf = StringBuilder()
   mem_buf.write_string("┌─ 记忆分布 ─┐\n")
   mem_buf.write_string("│ 核心记忆: ")
   mem_buf.write_string(core_count.to_string())
@@ -263,7 +262,7 @@ pub fn GhostValleyEngine::render_dashboard(
     "└──────────────────────────┘\n",
   )
   // 摘要
-  let summary_buf = StringBuilder::new()
+  let summary_buf = StringBuilder()
   summary_buf.write_string("┌─ 训练摘要 ─┐\n")
   summary_buf.write_string("│ 总轮次: ")
   summary_buf.write_string(stats.total_rounds_completed.to_string())
@@ -297,7 +296,7 @@ pub fn GhostValleyEngine::render_dashboard(
 ///|
 /// 仪表盘格式化为完整字符串
 pub fn TrainingDashboard::format(self : TrainingDashboard) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string(
     "╔══════════════════════════════════════╗\n",
   )
@@ -322,7 +321,7 @@ pub fn TrainingDashboard::format(self : TrainingDashboard) -> String {
 pub fn GhostValleyEngine::export_full_report_markdown(
   self : GhostValleyEngine,
 ) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let stats = self.training_stats
   let eval = self.evaluate_training()
   // 标题

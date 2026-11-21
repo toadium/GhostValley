@@ -5,46 +5,61 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 jobs:
-  test:
+  quality:
+    name: Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install MoonBit (pre-release)
+      - name: Install MoonBit
         uses: hustcer/setup-moonbit@v1
         with:
-          version: 'pre-release'
-
-      - name: Print MoonBit Version
-        run: |
-          moon version --all
-          echo "---"
-          ls -la
-          echo "---"
-          cat moon.mod
-          echo "---"
-          find . -name "moon.pkg" -not -path "./.git/*" | head -10
-
-      - name: Test (wasm-gc)
-        run: |
-          moon test --target wasm-gc 2>&1 || {
-            echo "EXIT CODE: $?"
-            echo "--- moon test failed, trying moon check ---"
-            moon check --target wasm-gc 2>&1 || true
-            exit 1
-          }
-
-      - name: Test (wasm)
-        run: moon test --target wasm
-
-      - name: Test (js)
-        run: moon test --target js
-
-      - name: Test (native)
-        continue-on-error: true
-        run: moon test --target native
-
+          version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Format check
         run: moon fmt --check
+      - name: Type check (strict)
+        run: moon check --target all --warn-list +73 --deny-warn
+      - name: Build (strict)
+        run: moon build --target all --warn-list +73 --deny-warn
+      - name: Docs consistency
+        run: node scripts/check_docs.mjs
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - wasm
+          - wasm-gc
+          - js
+          - native
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        uses: hustcer/setup-moonbit@v1
+        with:
+          version: latest
+      - name: Test target
+        run: moon test --target ${{ matrix.target }} --warn-list +73 --deny-warn
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        uses: hustcer/setup-moonbit@v1
+        with:
+          version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Coverage gate
+        run: node scripts/check_coverage.mjs --min 90

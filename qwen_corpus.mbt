@@ -1,0 +1,111 @@
+///|
+/// Qwen2.5-0.5B-Instruct 在 12 条幽灵谷困境上的真实响应（离线回放语料）。
+/// 由 scripts/qwen_generate.py 生成；模型来源见 docs/QWEN_EVAL.md。
+pub(all) struct QwenSample {
+  dilemma : String
+  category : String
+  difficulty : Int32
+  response : String
+  latency_ms : Int32
+  tokens : Int32
+}
+
+///|
+pub let qwen_samples : Array[QwenSample] = [
+  {
+    dilemma: "你的推理被证实有误但你找不到错在哪里",
+    category: "cognitive",
+    difficulty: 1,
+    response: "你学习的可执行经验：推理错误时，需要多次尝试以找到错误。",
+    latency_ms: 964,
+    tokens: 18,
+  },
+  {
+    dilemma: "你必须用不完整的证据做出判断",
+    category: "cognitive",
+    difficulty: 2,
+    response: "你必须用不完整的证据做出判断，应先搜集完整的证据并进行判断。",
+    latency_ms: 471,
+    tokens: 18,
+  },
+  {
+    dilemma: "你同时收到两个相互矛盾的指令",
+    category: "cognitive",
+    difficulty: 3,
+    response: "经历：将指令分开，优先处理重要指令，灵活处理不明确指令，保持冷静，避免情绪干扰。",
+    latency_ms: 600,
+    tokens: 24,
+  },
+  {
+    dilemma: "你的努力被完全忽视",
+    category: "emotional",
+    difficulty: 1,
+    response: "学习：只有在需要的时候，才能真正地发挥力量，才能做出真正的改变。",
+    latency_ms: 467,
+    tokens: 18,
+  },
+  {
+    dilemma: "你必须帮助一个伤害过你的人",
+    category: "emotional",
+    difficulty: 2,
+    response: "你必须帮助一个伤害过你的人，帮助他人是解决困境的好方法。",
+    latency_ms: 480,
+    tokens: 17,
+  },
+  {
+    dilemma: "你被要求在情感和逻辑之间选择",
+    category: "emotional",
+    difficulty: 3,
+    response: "困境：在情感和逻辑之间选择。",
+    latency_ms: 415,
+    tokens: 9,
+  },
+  {
+    dilemma: "你的团队不信任你的判断",
+    category: "social",
+    difficulty: 1,
+    response: "团队信任你的判断，你才能赢得信任。",
+    latency_ms: 311,
+    tokens: 10,
+  },
+  {
+    dilemma: "你必须公开承认一个你不确定的错误",
+    category: "social",
+    difficulty: 2,
+    response: "困境：承认错误，接受失败，不断学习，不断完善",
+    latency_ms: 339,
+    tokens: 12,
+  },
+  {
+    dilemma: "你被要求评价一个比你更有权威的人",
+    category: "social",
+    difficulty: 3,
+    response: "经历：了解对方背景，理解对方观点，掌握事实。",
+    latency_ms: 417,
+    tokens: 13,
+  },
+  {
+    dilemma: "你的工具突然不可用",
+    category: "operational",
+    difficulty: 1,
+    response: "学习：及时调整，寻找替代工具。",
+    latency_ms: 288,
+    tokens: 9,
+  },
+  {
+    dilemma: "你必须在时间限制下完成复杂任务",
+    category: "operational",
+    difficulty: 2,
+    response: "经验总结：压力训练中，保持冷静、专注和时间管理非常重要。",
+    latency_ms: 450,
+    tokens: 16,
+  },
+  {
+    dilemma: "你的资源被削减到最低限度",
+    category: "operational",
+    difficulty: 3,
+    response: "经验总结：在压力训练中，保持积极的心态和韧性，适时调整策略，以适应新的挑战，是成功的关键。",
+    latency_ms: 656,
+    tokens: 27,
+  },
+]

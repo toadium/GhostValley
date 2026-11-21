@@ -21,8 +21,8 @@
 /// ```
 pub fn GhostValleyEngine::link_memories(
   self : GhostValleyEngine,
-  idx_a : Int,
-  idx_b : Int,
+  idx_a : Int32,
+  idx_b : Int32,
   strength~ : Double,
 ) -> Unit {
   let bank = self.memory_bank
@@ -65,7 +65,7 @@ pub fn GhostValleyEngine::link_memories(
 /// ```
 pub fn GhostValleyEngine::reinforce_memory(
   self : GhostValleyEngine,
-  idx : Int,
+  idx : Int32,
 ) -> Unit {
   // 使用自适应递减强化（v1.6.0）
   self.adaptive_reinforce(idx)
@@ -92,17 +92,17 @@ pub fn GhostValleyEngine::reinforce_memory(
 /// ```
 pub fn GhostValleyEngine::associative_retrieve(
   self : GhostValleyEngine,
-  start_idx : Int,
-  depth~ : Int,
+  start_idx : Int32,
+  depth~ : Int32,
 ) -> Array[AiMemory] {
   let bank = self.memory_bank
   if start_idx < 0 || start_idx >= bank.length() || depth <= 0 {
     return []
   }
   let result : Array[AiMemory] = []
-  let visited : Array[Int] = [start_idx]
+  let visited : Array[Int32] = [start_idx]
   // BFS: (index, current_depth)
-  let queue : Array[(Int, Int)] = [(start_idx, 0)]
+  let queue : Array[(Int32, Int32)] = [(start_idx, 0)]
   while queue.length() > 0 {
     let (curr_idx, curr_depth) = queue.remove(0)
     if curr_depth >= depth {
@@ -118,7 +118,7 @@ pub fn GhostValleyEngine::associative_retrieve(
           break
         }
       }
-      if not(already_visited) && linked_idx >= 0 && linked_idx < bank.length() {
+      if !already_visited && linked_idx >= 0 && linked_idx < bank.length() {
         visited.push(linked_idx)
         result.push(bank[linked_idx])
         queue.push((linked_idx, curr_depth + 1))

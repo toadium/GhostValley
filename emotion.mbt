@@ -19,12 +19,13 @@
 ///   assert_eq(es.confidence, 0.5)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct EmotionState {
   mut stress_level : Double
   mut confidence : Double
   mut resilience : Double
   mood_history : Array[MoodSnapshot]
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend EmotionState with @debug.Debug::{to_repr}
@@ -39,12 +40,13 @@ pub extend EmotionState with FromJson::{from_json}
 /// 情绪快照
 ///
 /// 记录某一轮训练结束时的情绪状态。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct MoodSnapshot {
-  round : Int
+  round : Int32
   stress : Double
   confidence : Double
   resilience : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend MoodSnapshot with @debug.Debug::{to_repr}
@@ -59,15 +61,16 @@ pub extend MoodSnapshot with FromJson::{from_json}
 /// 情绪画像
 ///
 /// 训练全程的情绪变化轨迹统计。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct EmotionProfile {
   peak_stress : Double
   lowest_confidence : Double
   avg_stress : Double
   avg_confidence : Double
   stress_variance : Double
-  breakdown_count : Int
-  total_snapshots : Int
-} derive(Debug, ToJson, FromJson)
+  breakdown_count : Int32
+  total_snapshots : Int32
+}
 
 ///|
 pub extend EmotionProfile with @debug.Debug::{to_repr}
@@ -82,12 +85,13 @@ pub extend EmotionProfile with FromJson::{from_json}
 /// 检索权重策略
 ///
 /// 控制记忆检索时不同因素的权重分配。
+#derive(Debug, Eq, ToJson, FromJson)
 pub(all) enum WeightStrategy {
   Recency // 按时间近度加权（最近添加的记忆权重高）
   Frequency // 按访问频率加权（被检索次数多的权重高）
   Value // 按 value_score 加权（价值分高的权重高）
   Combined // 综合加权（value * 0.5 + frequency * 0.3 + recency * 0.2）
-} derive(Debug, Eq, ToJson, FromJson)
+}
 
 ///|
 pub extend WeightStrategy with @debug.Debug::{to_repr}
@@ -106,7 +110,7 @@ pub extend WeightStrategy with FromJson::{from_json}
 ///
 /// 训练开始时：无压力、中等信心、零韧性。
 pub fn EmotionState::initial() -> EmotionState {
-  { stress_level: 0.0, confidence: 0.5, resilience: 0.0, mood_history: [] }
+  { stress_level: 0.0, confidence: 0.5, resilience: 0.0, mood_history: [], }
 }
 
 ///|
@@ -117,8 +121,8 @@ pub fn EmotionState::initial() -> EmotionState {
 /// - `response_score`：0-1，响应质量越高信心增量越大
 pub fn EmotionState::update(
   self : EmotionState,
-  round~ : Int,
-  dilemma_difficulty~ : Int,
+  round~ : Int32,
+  dilemma_difficulty~ : Int32,
   response_score~ : Double,
 ) -> Unit {
   // 压力增量：难度 1→+0.1, 2→+0.2, 3→+0.35
@@ -141,7 +145,7 @@ pub fn EmotionState::update(
   self.confidence = clamp(self.confidence + confidence_delta, 0.0, 1.0)
   self.resilience = clamp(self.resilience + resilience_delta, 0.0, 1.0)
   // 记录快照
-  self.mood_history.push(MoodSnapshot::{
+  self.mood_history.push({
     round,
     stress: self.stress_level,
     confidence: self.confidence,
@@ -190,7 +194,7 @@ pub fn EmotionState::is_breakdown(self : EmotionState) -> Bool {
 pub fn EmotionState::profile(self : EmotionState) -> EmotionProfile {
   let history = self.mood_history
   if history.length() == 0 {
-    return EmotionProfile::{
+    return {
       peak_stress: 0.0,
       lowest_confidence: 0.0,
       avg_stress: 0.0,
@@ -228,7 +232,7 @@ pub fn EmotionState::profile(self : EmotionState) -> EmotionProfile {
     var_sum = var_sum + diff * diff
   }
   let variance = var_sum / n
-  EmotionProfile::{
+  {
     peak_stress: peak,
     lowest_confidence: lowest,
     avg_stress: avg_s,
@@ -268,7 +272,7 @@ pub fn EmotionState::confidence_trajectory(
 ///|
 /// 格式化情绪状态为可读字符串
 pub fn EmotionState::format(self : EmotionState) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("=== 情绪状态 ===\n")
   buf.write_string("压力水平: ")
   buf.write_string(self.stress_level.to_string())
@@ -307,13 +311,13 @@ pub fn EmotionState::format(self : EmotionState) -> String {
 ///   let gv = @ghostvalley.new_engine(max_memory_num=20)
 ///   gv.add_memory("顿悟反思改进", is_simulation=false)
 ///   gv.add_memory("普通日常随便", is_simulation=false)
-///   let results = gv.weighted_retrieve(1, @ghostvalley.Combined)
+///   let results = gv.weighted_retrieve(1, Combined)
 ///   assert_eq(results.length(), 1)
 /// }
 /// ```
 pub fn GhostValleyEngine::weighted_retrieve(
   self : GhostValleyEngine,
-  n : Int,
+  n : Int32,
   strategy : WeightStrategy,
 ) -> Array[AiMemory] {
   let bank = self.memory_bank

@@ -2,16 +2,17 @@
 /// 训练报告
 ///
 /// 记录幽灵谷训练的完整状态快照，用于分析和监控。
+#derive(Debug, ToJson)
 pub(all) struct TrainingReport {
-  total_rounds : Int
-  total_memories : Int
-  core_memories : Int
-  simulation_memories : Int
-  real_memories : Int
+  total_rounds : Int32
+  total_memories : Int32
+  core_memories : Int32
+  simulation_memories : Int32
+  real_memories : Int32
   willing_score : Double
   is_enabled : Bool
-  max_capacity : Int
-} derive(Debug, ToJson)
+  max_capacity : Int32
+}
 
 ///|
 pub extend TrainingReport with @debug.Debug::{to_repr}
@@ -50,7 +51,7 @@ pub fn GhostValleyEngine::training_report(
       real = real + 1
     }
   }
-  TrainingReport::{
+  {
     total_rounds: self.total_rounds,
     total_memories: self.memory_bank.length(),
     core_memories: core,
@@ -75,7 +76,7 @@ pub fn GhostValleyEngine::training_report_json(
 ///|
 /// 训练报告格式化输出
 pub fn TrainingReport::format(self : TrainingReport) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "======== 幽灵谷训练报告 ========\n"
   buf <+ "训练轮次: \{self.total_rounds}\n"
   buf <+ "记忆总数: \{self.total_memories} / \{self.max_capacity}\n"

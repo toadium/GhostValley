@@ -1,6 +1,19 @@
 # Changelog
 
-## [1.12.0] - 2026-08-25
+## [1.13.0] - 2026-11-21
+
+### Added
+- **Qwen2.5-0.5B-Instruct 本地模型回放**：QwenReplayLLM（12 条真实响应，跨后端确定性回放）
+- **Qwen 语料生成脚本**：scripts/qwen_generate.py（llama-cpp-python + GGUF，可复现）
+- **Qwen 评测**：docs/QWEN_EVAL.md（平均延迟 488ms、响应 26.8 字、191 tokens）
+- **质量门禁**：覆盖率门禁（91.6%，门槛 90%）、变异测试 10/10、文档一致性门禁、CI 四后端矩阵
+- **回归修复**：dilemma_library 关键字冲突（`var` → `name`）
+
+### Changed
+- 测试 480 → 489 / 后端（四后端共 1956）
+- 零警告治理：`StringBuilder()`、`#derive(...)`、去除冗余类型注解、移除 deprecated JSON API
+
+## ## [1.12.0] - 2026-08-25
 
 ### Added
 - **ASCII 折线图**：generate_ascii_chart(scores, title) 训练分数趋势可视化

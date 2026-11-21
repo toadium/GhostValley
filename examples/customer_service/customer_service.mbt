@@ -94,21 +94,21 @@ fn main {
     action="training_start",
     actor="customer_service_ai",
     detail="客服危机训练开始",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   audit.add_entry(
     timestamp=5,
     action="stress_spike",
     actor="emotion_monitor",
     detail="第5轮压力骤增",
-    risk_level=@ghostvalley.Medium,
+    risk_level=Medium,
   )
   audit.add_entry(
     timestamp=10,
     action="training_complete",
     actor="customer_service_ai",
     detail="训练完成，无崩溃",
-    risk_level=@ghostvalley.Low,
+    risk_level=Low,
   )
   println("  审计条目数: \{audit.entry_count()}")
   println("  CSV 导出预览:")
@@ -128,13 +128,13 @@ fn main {
 
   // ========== 8. 权重检索演示 ==========
   println("【8】权重检索策略演示")
-  let by_value = gv.weighted_retrieve(3, @ghostvalley.Value)
+  let by_value = gv.weighted_retrieve(3, Value)
   println("  按价值检索 Top 3:")
   for i, m in by_value {
     let preview = if m.content.length() > 30 { 30 } else { m.content.length() }
     println("    \{i + 1}. 分数:\{m.value_score} | \{m.content[:preview]}...")
   }
-  let by_combined = gv.weighted_retrieve(3, @ghostvalley.Combined)
+  let by_combined = gv.weighted_retrieve(3, Combined)
   println("  按综合策略检索 Top 3:")
   for i, m in by_combined {
     let preview = if m.content.length() > 30 { 30 } else { m.content.length() }

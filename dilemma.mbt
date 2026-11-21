@@ -23,11 +23,12 @@
 ///   assert_eq(d.difficulty, 2)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct Dilemma {
   content : String
   category : String
-  difficulty : Int
-} derive(Debug, ToJson, FromJson)
+  difficulty : Int32
+}
 
 ///|
 pub extend Dilemma with @debug.Debug::{to_repr}
@@ -43,7 +44,7 @@ pub extend Dilemma with FromJson::{from_json}
 pub fn Dilemma::new(
   content : String,
   category~ : String,
-  difficulty~ : Int,
+  difficulty~ : Int32,
 ) -> Dilemma {
   let cat = if category == "cognitive" ||
     category == "emotional" ||
@@ -60,7 +61,7 @@ pub fn Dilemma::new(
   } else {
     difficulty
   }
-  { content, category: cat, difficulty: diff }
+  { content, category: cat, difficulty: diff, }
 }
 
 ///|
@@ -174,7 +175,7 @@ pub fn GhostValleyEngine::get_dilemma_by_category(
 /// ```
 pub fn GhostValleyEngine::get_dilemma_by_difficulty(
   self : GhostValleyEngine,
-  difficulty : Int,
+  difficulty : Int32,
 ) -> Array[Dilemma] {
   let pool = self.structured_dilemma_pool
   let result : Array[Dilemma] = []

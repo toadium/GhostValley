@@ -16,6 +16,7 @@
 ///   assert_true(score > 0.3)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct ScoringConfig {
   high_value_words : Array[String]
   mid_value_words : Array[String]
@@ -27,7 +28,7 @@ pub(all) struct ScoringConfig {
   multi_high_bonus : Double
   multi_mid_bonus : Double
   multi_low_penalty : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend ScoringConfig with @debug.Debug::{to_repr}
@@ -116,11 +117,12 @@ pub fn configurable_text_value_score(
 /// - Hyperbolic: score / (1 + elapsed / half_life)（默认，当前行为）
 /// - Linear: score * max(0, 1 - elapsed * rate)
 /// - Exponential: score * decay_base^elapsed
+#derive(Debug, Eq, ToJson, FromJson)
 pub(all) enum DecayModel {
   Hyperbolic
   Linear
   Exponential
-} derive(Debug, Eq, ToJson, FromJson)
+}
 
 ///|
 pub extend DecayModel with @debug.Debug::{to_repr}
@@ -139,10 +141,11 @@ pub extend DecayModel with FromJson::{from_json}
 ///
 /// - `linear_rate`: Linear 模型的衰减率（默认 0.02）
 /// - `exp_decay_base`: Exponential 模型的衰减基数（默认 0.95）
+#derive(Debug, ToJson, FromJson)
 pub(all) struct DecayParams {
   linear_rate : Double
   exp_decay_base : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend DecayParams with @debug.Debug::{to_repr}
@@ -156,7 +159,7 @@ pub extend DecayParams with FromJson::{from_json}
 ///|
 /// 默认衰减参数
 pub fn DecayParams::default() -> DecayParams {
-  { linear_rate: 0.02, exp_decay_base: 0.95 }
+  { linear_rate: 0.02, exp_decay_base: 0.95, }
 }
 
 ///|
@@ -167,7 +170,7 @@ pub fn apply_decay_model(
   model : DecayModel,
   params : DecayParams,
   current_score : Double,
-  elapsed : Int,
+  elapsed : Int32,
 ) -> Double {
   if elapsed <= 0 {
     return current_score

@@ -24,11 +24,12 @@
 ///   assert_eq(cp.completed_rounds, 5)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct TrainingCheckpoint {
   engine_state : String
-  completed_rounds : Int
-  timestamp : Int
-} derive(Debug, ToJson, FromJson)
+  completed_rounds : Int32
+  timestamp : Int32
+}
 
 ///|
 pub extend TrainingCheckpoint with @debug.Debug::{to_repr}
@@ -116,9 +117,9 @@ pub fn[T : LLMAdapter] GhostValleyEngine::resume_training(
   self : GhostValleyEngine,
   checkpoint : TrainingCheckpoint,
   llm : T,
-  additional_rounds~ : Int,
-  decay_interval? : Int = 5,
-  cleanup_threshold? : Double = 0.1,
+  additional_rounds~ : Int32,
+  decay_interval~ : Int32 = 5,
+  cleanup_threshold~ : Double = 0.1,
 ) -> Unit {
   self.load_checkpoint(checkpoint)
   self.run_training_pipeline(
@@ -133,13 +134,14 @@ pub fn[T : LLMAdapter] GhostValleyEngine::resume_training(
 /// 回放结果
 ///
 /// 记录原训练 vs 回放训练的对比。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct ReplayResult {
-  original_rounds : Int
-  replayed_rounds : Int
+  original_rounds : Int32
+  replayed_rounds : Int32
   original_avg_score : Double
   replayed_avg_score : Double
   score_difference : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend ReplayResult with @debug.Debug::{to_repr}
@@ -170,7 +172,7 @@ pub extend ReplayResult with FromJson::{from_json}
 ///     cleanup_threshold=0.1,
 ///   )
 ///   let log = gv.training_log
-///   let original_score = gv.average_value_score()
+///   let _original_score = gv.average_value_score()
 ///   let gv2 = @ghostvalley.new_engine(max_memory_num=50)
 ///   ignore(gv2.wen_shi_verify("愿意接受挑战，接受压力训练"))
 ///   let result = gv2.replay_training(log, llm)
@@ -181,8 +183,8 @@ pub fn[T : LLMAdapter] GhostValleyEngine::replay_training(
   self : GhostValleyEngine,
   log : TrainingLog,
   llm : T,
-  new_scoring_config? : ScoringConfig = ScoringConfig::default(),
-  new_decay_model? : DecayModel = Hyperbolic,
+  new_scoring_config~ : ScoringConfig = ScoringConfig::default(),
+  new_decay_model~ : DecayModel = Hyperbolic,
 ) -> ReplayResult {
   // 应用新配置
   self.scoring_config = new_scoring_config
@@ -218,7 +220,7 @@ pub fn[T : LLMAdapter] GhostValleyEngine::replay_training(
     self.event_system.emit("ReplayRound", entry.round_num, entry.dilemma)
   }
   let replayed_avg = self.average_value_score()
-  ReplayResult::{
+  {
     original_rounds,
     replayed_rounds: original_rounds,
     original_avg_score: original_avg,
@@ -230,7 +232,7 @@ pub fn[T : LLMAdapter] GhostValleyEngine::replay_training(
 ///|
 /// 格式化回放结果
 pub fn ReplayResult::format(self : ReplayResult) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "======== 回放结果 ========\n"
   buf <+ "原训练轮次: \{self.original_rounds}\n"
   buf <+ "回放轮次: \{self.replayed_rounds}\n"

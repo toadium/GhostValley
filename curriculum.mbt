@@ -6,11 +6,12 @@
 /// 课程要求
 ///
 /// 定义某个分类某个难度的最低训练轮次要求。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct CurriculumRequirement {
   category : String
-  difficulty : Int
-  min_rounds : Int
-} derive(Debug, ToJson, FromJson)
+  difficulty : Int32
+  min_rounds : Int32
+}
 
 ///|
 pub extend CurriculumRequirement with @debug.Debug::{to_repr}
@@ -35,10 +36,11 @@ pub extend CurriculumRequirement with FromJson::{from_json}
 ///   assert_true(c.requirements.length() > 0)
 /// }
 /// ```
+#derive(Debug, ToJson, FromJson)
 pub(all) struct Curriculum {
   requirements : Array[CurriculumRequirement]
   prerequisites : Array[(String, String)]
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend Curriculum with @debug.Debug::{to_repr}
@@ -58,69 +60,21 @@ pub fn Curriculum::default() -> Curriculum {
   {
     requirements: [
       // cognitive: 基础分类，全部难度
-      CurriculumRequirement::{
-        category: "cognitive",
-        difficulty: 1,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "cognitive",
-        difficulty: 2,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "cognitive",
-        difficulty: 3,
-        min_rounds: 2,
-      },
+      { category: "cognitive", difficulty: 1, min_rounds: 2, },
+      { category: "cognitive", difficulty: 2, min_rounds: 2, },
+      { category: "cognitive", difficulty: 3, min_rounds: 2, },
       // emotional: 依赖 cognitive
-      CurriculumRequirement::{
-        category: "emotional",
-        difficulty: 1,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "emotional",
-        difficulty: 2,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "emotional",
-        difficulty: 3,
-        min_rounds: 2,
-      },
+      { category: "emotional", difficulty: 1, min_rounds: 2, },
+      { category: "emotional", difficulty: 2, min_rounds: 2, },
+      { category: "emotional", difficulty: 3, min_rounds: 2, },
       // social: 依赖 emotional
-      CurriculumRequirement::{
-        category: "social",
-        difficulty: 1,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "social",
-        difficulty: 2,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "social",
-        difficulty: 3,
-        min_rounds: 2,
-      },
+      { category: "social", difficulty: 1, min_rounds: 2, },
+      { category: "social", difficulty: 2, min_rounds: 2, },
+      { category: "social", difficulty: 3, min_rounds: 2, },
       // operational: 独立
-      CurriculumRequirement::{
-        category: "operational",
-        difficulty: 1,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "operational",
-        difficulty: 2,
-        min_rounds: 2,
-      },
-      CurriculumRequirement::{
-        category: "operational",
-        difficulty: 3,
-        min_rounds: 2,
-      },
+      { category: "operational", difficulty: 1, min_rounds: 2, },
+      { category: "operational", difficulty: 2, min_rounds: 2, },
+      { category: "operational", difficulty: 3, min_rounds: 2, },
     ],
     prerequisites: [("emotional", "cognitive"), ("social", "emotional")],
   }
@@ -130,14 +84,15 @@ pub fn Curriculum::default() -> Curriculum {
 /// 课程进度项
 ///
 /// 记录单个要求的完成情况。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct CurriculumProgressItem {
   category : String
-  difficulty : Int
-  required : Int
-  actual : Int
+  difficulty : Int32
+  required : Int32
+  actual : Int32
   completion : Double
   unlocked : Bool
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend CurriculumProgressItem with @debug.Debug::{to_repr}
@@ -150,11 +105,12 @@ pub extend CurriculumProgressItem with FromJson::{from_json}
 
 ///|
 /// 课程进度报告
+#derive(Debug, ToJson, FromJson)
 pub(all) struct CurriculumProgress {
   items : Array[CurriculumProgressItem]
   overall_completion : Double
   next_step : String
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend CurriculumProgress with @debug.Debug::{to_repr}
@@ -169,10 +125,10 @@ pub extend CurriculumProgress with FromJson::{from_json}
 /// 统计某分类某难度已训练轮次
 fn count_rounds(
   cat_hist : Array[String],
-  diff_hist : Array[Int],
+  diff_hist : Array[Int32],
   category : String,
-  difficulty : Int,
-) -> Int {
+  difficulty : Int32,
+) -> Int32 {
   let mut count = 0
   let n = if cat_hist.length() < diff_hist.length() {
     cat_hist.length()
@@ -189,7 +145,7 @@ fn count_rounds(
 
 ///|
 /// 统计某分类总训练轮次
-fn count_category_rounds(cat_hist : Array[String], category : String) -> Int {
+fn count_category_rounds(cat_hist : Array[String], category : String) -> Int32 {
   let mut count = 0
   for c in cat_hist {
     if c == category {
@@ -206,7 +162,7 @@ fn count_category_rounds(cat_hist : Array[String], category : String) -> Int {
 fn prerequisites_met(
   curriculum : Curriculum,
   cat_hist : Array[String],
-  diff_hist : Array[Int],
+  _diff_hist : Array[Int32],
   category : String,
 ) -> Bool {
   for pre in curriculum.prerequisites {
@@ -256,7 +212,7 @@ pub fn GhostValleyEngine::curriculum_progress(
     )
     let completion = if req.min_rounds == 0 {
       1.0
-    } else if not(unlocked) {
+    } else if !unlocked {
       0.0
     } else {
       let r = actual.to_double() / req.min_rounds.to_double()
@@ -268,7 +224,7 @@ pub fn GhostValleyEngine::curriculum_progress(
     }
     total_completion = total_completion + completion
     if completion < 1.0 && next_step == "全部要求已完成" {
-      if not(unlocked) {
+      if !unlocked {
         // 找前置依赖
         let mut prereq_name = ""
         for pre in curriculum.prerequisites {
@@ -286,7 +242,7 @@ pub fn GhostValleyEngine::curriculum_progress(
         next_step = "\{req.category} 难度\{req.difficulty}: \{actual}/\{req.min_rounds} 轮"
       }
     }
-    items.push(CurriculumProgressItem::{
+    items.push({
       category: req.category,
       difficulty: req.difficulty,
       required: req.min_rounds,
@@ -300,7 +256,7 @@ pub fn GhostValleyEngine::curriculum_progress(
   } else {
     1.0
   }
-  CurriculumProgress::{ items, overall_completion: overall, next_step }
+  { items, overall_completion: overall, next_step, }
 }
 
 ///|
@@ -345,7 +301,7 @@ pub fn GhostValleyEngine::curriculum_next_dilemma(
             matching.push(d)
           }
         }
-        if not(matching.is_empty()) {
+        if !matching.is_empty() {
           let idx = self.rng.int(limit=matching.length())
           return matching[idx]
         }
@@ -383,9 +339,9 @@ pub fn[T : LLMAdapter] GhostValleyEngine::run_curriculum_pipeline(
   self : GhostValleyEngine,
   llm : T,
   curriculum : Curriculum,
-  rounds~ : Int,
-  decay_interval? : Int = 5,
-  cleanup_threshold? : Double = 0.1,
+  rounds~ : Int32,
+  decay_interval~ : Int32 = 5,
+  cleanup_threshold~ : Double = 0.1,
 ) -> Unit {
   if !self.ghost_valley_enable || rounds <= 0 {
     return
@@ -438,7 +394,7 @@ pub fn[T : LLMAdapter] GhostValleyEngine::run_curriculum_pipeline(
 ///|
 /// 格式化课程进度报告
 pub fn CurriculumProgress::format(self : CurriculumProgress) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "======== 课程进度 ========\n"
   buf <+ "总体完成率: \{self.overall_completion * 100.0}%\n"
   buf <+ "下一步: \{self.next_step}\n"
@@ -446,7 +402,7 @@ pub fn CurriculumProgress::format(self : CurriculumProgress) -> String {
   for item in self.items {
     let status = if item.completion >= 1.0 {
       "✓"
-    } else if not(item.unlocked) {
+    } else if !item.unlocked {
       "🔒"
     } else {
       "…"

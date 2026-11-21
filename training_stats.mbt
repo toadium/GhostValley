@@ -3,16 +3,17 @@
 ///
 /// 跨轮次记录训练过程中的关键指标，用于分析训练效果和调参。
 /// 由 `run_training_pipeline` 自动更新，也可手动更新。
+#derive(Debug, ToJson, FromJson)
 pub(all) struct TrainingStats {
-  mut total_rounds_completed : Int
-  mut total_memories_added : Int
-  mut total_memories_cleaned : Int
-  mut total_decay_applied : Int
+  mut total_rounds_completed : Int32
+  mut total_memories_added : Int32
+  mut total_memories_cleaned : Int32
+  mut total_decay_applied : Int32
   avg_score_history : Array[Double]
-  memory_count_history : Array[Int]
-  round_difficulty_history : Array[Int]
+  memory_count_history : Array[Int32]
+  round_difficulty_history : Array[Int32]
   round_category_history : Array[String]
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend TrainingStats with @debug.Debug::{to_repr}
@@ -69,7 +70,7 @@ pub fn TrainingStats::score_trend(self : TrainingStats) -> Double {
 ///|
 /// 格式化输出统计信息
 pub fn TrainingStats::format(self : TrainingStats) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("======== 训练统计 ========\n")
   buf.write_string("完成轮次: ")
   buf.write_string(self.total_rounds_completed.to_string())

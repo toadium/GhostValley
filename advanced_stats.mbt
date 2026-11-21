@@ -52,13 +52,14 @@ pub fn confidence_interval(
 
 ///|
 /// 显著性检验结果
+#derive(Debug, ToJson, FromJson)
 pub(all) struct SignificanceResult {
   is_significant : Bool
   t_value : Double
   mean_before : Double
   mean_after : Double
   difference : Double
-} derive(Debug, ToJson, FromJson)
+}
 
 ///|
 pub extend SignificanceResult with @debug.Debug::{to_repr}
@@ -91,7 +92,7 @@ pub fn significance_test(
   let n_before = before_scores.length()
   let n_after = after_scores.length()
   if n_before == 0 || n_after == 0 {
-    return SignificanceResult::{
+    return {
       is_significant: false,
       t_value: 0.0,
       mean_before: 0.0,
@@ -137,7 +138,7 @@ pub fn significance_test(
   let se_a = std_a * std_a / n_after.to_double()
   let pooled_se = (se_b + se_a).sqrt()
   let t = if pooled_se > 0.0 { diff / pooled_se } else { 0.0 }
-  SignificanceResult::{
+  {
     is_significant: t.abs() > 1.96,
     t_value: t,
     mean_before: mean_b,
@@ -168,7 +169,7 @@ pub fn significance_test(
 /// }
 /// ```
 pub fn GhostValleyEngine::export_report_csv(self : GhostValleyEngine) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "round,avg_score,memory_count,category,difficulty\n"
   let stats = self.training_stats
   let n = stats.avg_score_history.length()
@@ -220,7 +221,7 @@ pub fn GhostValleyEngine::export_evaluation_json(
 ) -> String {
   let stats = self.training_stats
   let eval = self.evaluate_training()
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "{\n"
   buf <+ "  \"training_stats\": {\n"
   buf <+ "    \"total_rounds\": \{stats.total_rounds_completed},\n"
@@ -271,7 +272,7 @@ pub fn GhostValleyEngine::export_evaluation_json(
 pub fn GhostValleyEngine::training_summary(self : GhostValleyEngine) -> String {
   let stats = self.training_stats
   let eval = self.evaluate_training()
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   // 标题
   buf <+ "======== GhostValley 训练总结 ========\n\n"
   // 基本统计

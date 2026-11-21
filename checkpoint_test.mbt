@@ -210,13 +210,9 @@ test "replay_training: 使用新衰减模型" {
   let log = gv.training_log
   let gv2 = @ghostvalley.new_engine(max_memory_num=50)
   ignore(gv2.wen_shi_verify("愿意接受挑战，接受压力训练"))
-  let result = gv2.replay_training(
-    log,
-    llm,
-    new_decay_model=@ghostvalley.Linear,
-  )
+  let result = gv2.replay_training(log, llm, new_decay_model=Linear)
   assert_eq(result.replayed_rounds, 3)
-  assert_eq(gv2.decay_model, @ghostvalley.Linear)
+  assert_eq(gv2.decay_model, Linear)
 }
 
 ///|
@@ -291,5 +287,5 @@ test "TrainingCheckpoint: ToJson 序列化正确" {
   gv.add_memory("顿悟反思", is_simulation=false)
   let cp = gv.save_checkpoint()
   let json = cp.to_json()
-  assert_true(json.to_string().contains("completed_rounds"))
+  assert_true(json.stringify().contains("completed_rounds"))
 }

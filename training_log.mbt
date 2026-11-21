@@ -2,12 +2,13 @@
 /// 训练日志条目
 ///
 /// 记录单轮训练的困境、AI 响应及训练后记忆库状态。
+#derive(Debug, Eq, ToJson, FromJson)
 pub(all) struct TrainingLogEntry {
-  round_num : Int
+  round_num : Int32
   dilemma : String
   ai_response : String
-  memory_count_after : Int
-} derive(Debug, Eq, ToJson, FromJson)
+  memory_count_after : Int32
+}
 
 ///|
 pub extend TrainingLogEntry with @debug.Debug::{to_repr}
@@ -25,9 +26,10 @@ pub extend TrainingLogEntry with FromJson::{from_json}
 /// 训练日志
 ///
 /// 按时间顺序记录所有训练轮次，支持 JSON 导出和格式化输出。
+#derive(Debug, FromJson)
 pub(all) struct TrainingLog {
   entries : Array[TrainingLogEntry]
-} derive(Debug, FromJson)
+}
 
 ///|
 pub extend TrainingLog with @debug.Debug::{to_repr}
@@ -38,29 +40,24 @@ pub extend TrainingLog with FromJson::{from_json}
 ///|
 /// 创建空的训练日志
 pub fn TrainingLog::new() -> TrainingLog {
-  { entries: [] }
+  { entries: [], }
 }
 
 ///|
 /// 添加日志条目
 pub fn TrainingLog::add_entry(
   self : TrainingLog,
-  round_num : Int,
+  round_num : Int32,
   dilemma : String,
   ai_response : String,
-  memory_count_after : Int,
+  memory_count_after : Int32,
 ) -> Unit {
-  self.entries.push(TrainingLogEntry::{
-    round_num,
-    dilemma,
-    ai_response,
-    memory_count_after,
-  })
+  self.entries.push({ round_num, dilemma, ai_response, memory_count_after, })
 }
 
 ///|
 /// 获取日志条目数量
-pub fn TrainingLog::length(self : TrainingLog) -> Int {
+pub fn TrainingLog::length(self : TrainingLog) -> Int32 {
   self.entries.length()
 }
 
@@ -80,7 +77,7 @@ pub extend TrainingLog with ToJson::{to_json}
 ///|
 /// 训练日志格式化输出
 pub fn TrainingLog::format(self : TrainingLog) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf <+ "======== 幽灵谷训练日志 ========\n"
   buf <+ "共 \{self.entries.length()} 轮训练记录\n"
   buf <+ "--------------------------------\n"
