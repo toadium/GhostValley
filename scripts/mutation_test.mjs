@@ -130,6 +130,14 @@ const MUTATIONS = [
     replace: "QwenReplayLLM::with_samples(qwen_samples,",
     pkg: PKG,
   },
+  {
+    id: "M14",
+    name: "清理不再保护核心记忆",
+    file: "decay.mbt",
+    find: "if !m.is_core_memory && m.value_score < threshold {",
+    replace: "if m.value_score < threshold {",
+    pkg: PKG,
+  },
 ];
 
 function runTests() {

@@ -38,6 +38,8 @@ for (const match of output.matchAll(pattern)) {
   if (file.includes("/_build/") || file.startsWith("_build/")) continue;
   if (file.includes("/examples/") || file.startsWith("examples/")) continue;
   if (file.includes("/playground/") || file.startsWith("playground/")) continue;
+  if (file.includes("/cli/") || file.startsWith("cli/")) continue;
+  if (file.includes("/bench/") || file.startsWith("bench/")) continue;
   rows.push({ file, covered: Number(match[2]), total: Number(match[3]) });
 }
 

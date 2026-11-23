@@ -30,6 +30,8 @@ jobs:
         run: node scripts/check_docs.mjs
       - name: Qwen curated example smoke
         run: moon run examples/qwen_curated --target native --warn-list +73 --deny-warn
+      - name: CLI smoke
+        run: moon run cli --target native -- help
 
   test:
     name: Test
@@ -80,3 +82,15 @@ jobs:
           node-version: 22
       - name: Pages check
         run: node scripts/check_pages.mjs
+
+  bench:
+    name: Bench smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        uses: hustcer/setup-moonbit@v1
+        with:
+          version: latest
+      - name: Run benchmark
+        run: moon run bench --target native --release

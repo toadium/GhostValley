@@ -1,0 +1,12 @@
+import {
+  "moonbitlang/core/async",
+  "walkzzz/ghostvalley",
+}
+
+options(
+  "allow-experimental-packages": [ "moonbitlang/core/async" ],
+)
+
+pkgtype(kind: "executable")
+
+supported_targets = "native"

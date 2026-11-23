@@ -32,13 +32,13 @@ check(
 check("A2 申报书版本 = moon.mod", proposal.includes(`v${version}`), `申报书未写 v${version}`);
 check("A3 自查报告版本 = moon.mod", selfCheck.includes(`v${version}`), `自查报告未写 v${version}`);
 
-check("A4 README 测试数 503", readme.includes("503"), "README 未写 503");
-check("A5 申报书测试数 503", proposal.includes("503"), "申报书未写 503");
-check("A6 自查报告测试数 503", selfCheck.includes("503"), "自查报告未写 503");
-check("A7 测试报告测试数 503", testReport.includes("503"), "TEST_REPORT 未写 503");
+check("A4 README 测试数 505", readme.includes("505"), "README 未写 505");
+check("A5 申报书测试数 505", proposal.includes("505"), "申报书未写 505");
+check("A6 自查报告测试数 505", selfCheck.includes("505"), "自查报告未写 505");
+check("A7 测试报告测试数 505", testReport.includes("505"), "TEST_REPORT 未写 505");
 
 check("A8 覆盖率 ≥ 90% 记录", testReport.includes("91.6%") && testReport.includes("1356"), "TEST_REPORT 缺覆盖率");
-check("A9 变异 13/13 记录", testReport.includes("13 / 13 KILLED") || testReport.includes("13/13 KILLED"), "TEST_REPORT 缺变异");
+check("A9 变异 14/14 记录", testReport.includes("14 / 14 KILLED") || testReport.includes("14/14 KILLED"), "TEST_REPORT 缺变异");
 
 check("A10 Qwen 评测文档存在", existsSync(resolve(root, "docs/QWEN_EVAL.md")) && qwenEval.includes("Qwen2.5-0.5B"), "缺少 QWEN_EVAL.md");
 check("A11 Qwen 语料 12 条", (corpus.match(/dilemma:/g) ?? []).length === 12, "qwen_corpus.mbt 样本数不是 12");
@@ -134,6 +134,13 @@ for (const file of [
 ]) {
   check(`A30 决赛材料存在 ${file}`, existsSync(resolve(root, file)), "文件不存在");
 }
+check(
+  "A31b CLI / bench 存在",
+  existsSync(resolve(root, "cli/main.mbt")) &&
+    existsSync(resolve(root, "bench/main.mbt")) &&
+    existsSync(resolve(root, "invariant_property_test.mbt")),
+  "缺少 CLI/bench/属性测试",
+);
 check(
   "A31 README 含在线演示与决赛材料",
   readme.includes("toadium.github.io/GhostValley") &&

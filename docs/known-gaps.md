@@ -10,8 +10,8 @@
 
 ## 工程
 
-- **无 MCP server / CLI 独立包**：目前通过 4 个 `examples/*` 可执行程序使用。
-- **无独立 benchmark 包**：性能断言在测试内，未形成持续趋势。
+- **无 MCP server**：CLI 已提供 6 命令（`moon run cli`），MCP 尚未实现。
+- **benchmark 已提供**：`moon run bench --target native --release`；尚未接入历史趋势。
 - **GitHub Pages 待启用**：`docs/` + `playground.js` 已就绪，`check_pages` 21 项；需维护者 Settings 启用。
 - **Gitlink 镜像待创建**：申报材料中留待提交前填写。
 - **mooncakes 线上版本滞后**：registry 为 0.3.0；0.4.0 需发布后核对。

@@ -29,7 +29,17 @@
 - `QwenReplayLLM`：12 条基础语料 + 24 条精选语料（`new_curated`），编译进 `qwen_corpus.mbt` / `qwen_curated.mbt`，四后端确定性回放。
 - 评测：144 次真实推理（24 困境 × 3 温度 × 2 seed）；精选语料 23/24 达质量门槛，详见 [docs/QWEN_EVAL.md](docs/QWEN_EVAL.md)。
 - 重新生成语料：`python scripts/qwen_generate.py`、`python scripts/curate_qwen_corpus.py`（本地 GGUF + llama-cpp-python）。
-- 质量门禁：503 × 4 测试、覆盖率 91.6%（1356/1480）、变异 13/13、严格零警告。
+- 质量门禁：505 × 4 测试、覆盖率 91.6%（1356/1480）、变异 14/14、严格零警告。
+
+## CLI 与基准
+
+```bash
+moon run cli --target native -- help    # version/quality/eval/run/run20/help
+moon run cli --target native -- run     # 8 轮 Qwen 精选回放训练
+moon run bench --target native --release
+```
+
+CLI 为真实 argv 入口（`@env.args()`），bench 覆盖引擎/记忆/检索/衰减/序列化/Qwen 回放/训练管道。
 
 ## 快速开始
 

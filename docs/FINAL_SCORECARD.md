@@ -7,9 +7,9 @@
 
 | 证据 | 数字/命令 |
 |---|---|
-| 四后端测试 | `moon test --target all` → 503 × 4，0 失败 |
+| 四后端测试 | `moon test --target all` → 505 × 4，0 失败 |
 | 覆盖率 | 1356 / 1480 = **91.6%**（`node scripts/check_coverage.mjs --min 90`） |
-| 变异 | **13 / 13 KILLED**（`node scripts/mutation_test.mjs`） |
+| 变异 | **14 / 14 KILLED**（`node scripts/mutation_test.mjs`） |
 | 严格检查 | `moon check --target all --warn-list +73 --deny-warn` → 0/0 |
 | 规模 | 25 源码文件 + 27 测试文件；训练/记忆/评估/多智能体/协议/审计/可视化全链路 |
 | 零外部服务 | 仅 `@rand/@debug/@json`；Qwen 语料编译进包，四后端确定性回放 |
@@ -40,7 +40,7 @@
 |---|---|
 | CI | quality（fmt/check/build/docs/示例 smoke） + test×4 + coverage + pages |
 | 覆盖率门槛 | 90%（当前 91.6%） |
-| 变异门禁 | 13/13，自动恢复，运行前后工作区一致 |
+| 变异门禁 | 14/14，自动恢复，运行前后工作区一致 |
 | 文档门禁 | `node scripts/check_docs.mjs` → 36 项 |
 | AI 校验闭环 | `docs/AI_EVIDENCE.md`：3 个“AI 生成/测试发现错误 → 修复”实例 |
 | 可复现 | `docs/DEMO_SCRIPT.md` 8 分钟离线演示 |
