@@ -100,6 +100,47 @@ check(
   "ci.yml 缺示例 smoke",
 );
 
+const indexHtml = read("docs/index.html");
+const appJs = read("docs/app.js");
+const pagesYml = read(".github/workflows/pages.yml");
+check(
+  "A26 展示页三件套存在",
+  existsSync(resolve(root, "docs/index.html")) &&
+    existsSync(resolve(root, "docs/app.js")) &&
+    existsSync(resolve(root, "docs/style.css")),
+  "展示页文件不完整",
+);
+check(
+  "A27 展示页加载 playground.js",
+  appJs.includes("./playground.js") && indexHtml.includes("app.js"),
+  "app.js 未引用 playground.js",
+);
+check(
+  "A28 Pages workflow 构建 playground",
+  pagesYml.includes("playground"),
+  "pages.yml 未构建 playground",
+);
+check(
+  "A29 CI 引用 Pages 门禁",
+  ci.includes("check_pages.mjs"),
+  "ci.yml 缺 check_pages.mjs",
+);
+for (const file of [
+  "docs/FINAL_SCORECARD.md",
+  "docs/DEMO_SCRIPT.md",
+  "docs/COMPETITIVE_MATRIX.md",
+  "docs/TECH_CHALLENGES.md",
+  "docs/AI_EVIDENCE.md",
+]) {
+  check(`A30 决赛材料存在 ${file}`, existsSync(resolve(root, file)), "文件不存在");
+}
+check(
+  "A31 README 含在线演示与决赛材料",
+  readme.includes("toadium.github.io/GhostValley") &&
+    readme.includes("FINAL_SCORECARD.md"),
+  "README 缺在线演示/决赛材料入口",
+);
+
 console.log(`passed ${passes.length}, failed ${failures.length}`);
 if (failures.length > 0) {
   console.error("docs consistency failed:");

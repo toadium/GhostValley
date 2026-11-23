@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GhostValley · AI 心理压力演练（浏览器内演示）</title>
+  <meta name="description" content="GhostValley：AI 心理压力演练系统。困境 → Qwen 回放感悟 → 记忆/遗忘 → 评估 → 回放。页面内由 MoonBit 编译到 JavaScript，无后端、无网络请求。" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">MoonBit · 季度赛决赛演示</p>
+    <h1>GhostValley</h1>
+    <p class="tagline">AI 心理压力演练：在可控挫折中训练韧性</p>
+    <p class="sub">
+      困境生成 → Qwen 回放感悟 → 记忆/遗忘 → 评估 → 回放。
+      页面内所有计算由同一份 MoonBit 实现编译到 JavaScript 完成。
+    </p>
+    <div class="badges">
+      <span id="version">0.4.0</span>
+      <span>503 × 4 后端测试</span>
+      <span>覆盖率 91.6%</span>
+      <span>变异 13 / 13 KILLED</span>
+      <span>Qwen 精选 23 / 24</span>
+    </div>
+    <div class="links">
+      <a href="https://github.com/toadium/GhostValley">GitHub</a>
+      <a href="https://mooncakes.io/docs/walkzzz/ghostvalley">mooncakes</a>
+      <a href="https://github.com/toadium/GhostValley/blob/main/申报书.md">申报书</a>
+      <a href="https://github.com/toadium/GhostValley/blob/main/docs/FINAL_SCORECARD.md">评分自证</a>
+      <a href="https://github.com/toadium/GhostValley/blob/main/docs/TEST_REPORT.md">测试报告</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Qwen 回放质量 <span class="tag">qwen_curated_quality</span></h2>
+      <div class="grid">
+        <div>
+          <h3>精选 24 条</h3>
+          <pre id="curated">加载中…</pre>
+        </div>
+        <div>
+          <h3>基础 12 条</h3>
+          <pre id="base">加载中…</pre>
+        </div>
+        <div>
+          <h3>144 次评测</h3>
+          <pre id="eval">加载中…</pre>
+        </div>
+      </div>
+      <p class="hint">质量门槛：15–80 字、3-gram 重复 ≤0.35、无安全词、至少 1 个质量词。</p>
+    </section>
+
+    <section class="card">
+      <h2>跑一轮压力训练 <span class="tag">gv_run</span></h2>
+      <div class="row">
+        <label>训练轮次
+          <input id="rounds" type="number" min="1" max="20" value="8" />
+        </label>
+        <button id="run">开始训练</button>
+        <button id="run20">20 轮压测</button>
+      </div>
+      <pre id="report">点击“开始训练”，查看确定性回放报告。</pre>
+    </section>
+
+    <section class="card how">
+      <h2>为什么这是“可验证”的</h2>
+      <ul>
+        <li>Qwen2.5-0.5B 只在离线生成语料；运行时确定性回放，四后端一致。</li>
+        <li>质量层 + 严格模式：低质量/含安全词响应自动回退，不把 0.5B 输出当结论。</li>
+        <li>503×4 测试、覆盖率 91.6%、13 个变异点、文档一致性 36 项；全部命令可复现。</li>
+        <li>模拟挫折强制 <code>is_simulation</code> 标记；训练协议限制压力/信心/冷却期。</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>GhostValley · Apache-2.0 · MoonBit</p>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

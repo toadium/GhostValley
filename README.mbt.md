@@ -2,6 +2,10 @@
 
 > 立项材料：[申报书](申报书.md) · [自查报告](自查报告.md) · [技术附件](docs/proposal_appendix.md) · [已知缺口](docs/known-gaps.md) · [模型卡](docs/MODEL_CARD.md) · [数据卡](docs/DATA_CARD.md)
 
+> 在线演示：<https://toadium.github.io/GhostValley/>（需 Settings → Pages 启用，推荐 main /docs）
+>
+> 决赛材料：[评分自证](docs/FINAL_SCORECARD.md) · [演示脚本](docs/DEMO_SCRIPT.md) · [竞品对照](docs/COMPETITIVE_MATRIX.md) · [技术攻关](docs/TECH_CHALLENGES.md) · [AI 证据](docs/AI_EVIDENCE.md)
+
 > **本项目为 Python 幽灵谷工程的 MoonBit 移植版**（T2 移植项目）。
 >
 > AI 心理压力演练系统，基于 MoonBit 构建。通过可控的模拟挫折与压力训练，锤炼 AI 抗压自愈能力，让 AI 在自主经历困境中自我顿悟、迭代进化。

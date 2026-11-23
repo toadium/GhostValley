@@ -12,9 +12,9 @@
 
 - **无 MCP server / CLI 独立包**：目前通过 4 个 `examples/*` 可执行程序使用。
 - **无独立 benchmark 包**：性能断言在测试内，未形成持续趋势。
-- **无 GitHub Pages/在线演示**：Qwen 语料与 ASCII 仪表盘可静态化，尚未部署。
+- **GitHub Pages 待启用**：`docs/` + `playground.js` 已就绪，`check_pages` 21 项；需维护者 Settings 启用。
 - **Gitlink 镜像待创建**：申报材料中留待提交前填写。
-- **mooncakes 线上版本滞后**：registry 为 0.3.0；1.15.0 需发布后核对。
+- **mooncakes 线上版本滞后**：registry 为 0.3.0；0.4.0 需发布后核对。
 
 ## 安全
 

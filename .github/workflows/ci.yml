@@ -65,3 +65,18 @@ jobs:
           node-version: 22
       - name: Coverage gate
         run: node scripts/check_coverage.mjs --min 90
+
+  pages:
+    name: Pages demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        uses: hustcer/setup-moonbit@v1
+        with:
+          version: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pages check
+        run: node scripts/check_pages.mjs
