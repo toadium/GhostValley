@@ -1,0 +1,10 @@
+title: GhostValley
+description: AI 心理压力演练系统 — 在可控挫折中训练韧性（MoonBit）
+lang: zh-CN
+theme: jekyll-theme-cayman
+show_downloads: false
+github:
+  owner_name: toadium
+  repository_name: GhostValley
+  repository_url: https://github.com/toadium/GhostValley
+  is_project_page: true

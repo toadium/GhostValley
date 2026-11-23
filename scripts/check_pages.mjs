@@ -15,14 +15,30 @@ function check(name, ok, detail) {
   if (!ok) failures += 1;
 }
 
-for (const file of ["docs/index.html", "docs/app.js", "docs/style.css"]) {
+for (const file of [
+  "docs/index.md",
+  "docs/_config.yml",
+  "docs/demo.html",
+  "docs/app.js",
+  "docs/style.css",
+]) {
   check(`asset exists: ${file}`, existsSync(join(root, file)));
 }
 
-const html = readFileSync(join(root, "docs/index.html"), "utf8");
+const landing = readFileSync(join(root, "docs/index.md"), "utf8");
+const jekyllConfig = readFileSync(join(root, "docs/_config.yml"), "utf8");
+const html = readFileSync(join(root, "docs/demo.html"), "utf8");
 const appJs = readFileSync(join(root, "docs/app.js"), "utf8");
-check("index mentions GhostValley + Qwen", html.includes("GhostValley") && html.includes("Qwen"));
-check("index loads app.js / style.css", html.includes("app.js") && html.includes("style.css"));
+check(
+  "landing mentions GhostValley + Quick start",
+  landing.includes("GhostValley") && landing.includes("快速开始"),
+);
+check("landing links interactive demo", landing.includes("demo.html"));
+check(
+  "Cayman theme configured",
+  jekyllConfig.includes("theme: jekyll-theme-cayman"),
+);
+check("demo loads app.js / style.css", html.includes("app.js") && html.includes("style.css"));
 check("app.js imports playground.js", appJs.includes("./playground.js"));
 
 const build = spawnSync("moon", ["build", "--target", "js", "--release", "playground"], {

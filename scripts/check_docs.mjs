@@ -100,20 +100,27 @@ check(
   "ci.yml 缺示例 smoke",
 );
 
-const indexHtml = read("docs/index.html");
+const landing = read("docs/index.md");
+const demoHtml = read("docs/demo.html");
+const jekyllConfig = read("docs/_config.yml");
 const appJs = read("docs/app.js");
 const pagesYml = read(".github/workflows/pages.yml");
 check(
-  "A26 展示页三件套存在",
-  existsSync(resolve(root, "docs/index.html")) &&
+  "A26 展示页文件存在",
+  existsSync(resolve(root, "docs/index.md")) &&
+    existsSync(resolve(root, "docs/_config.yml")) &&
+    existsSync(resolve(root, "docs/demo.html")) &&
     existsSync(resolve(root, "docs/app.js")) &&
     existsSync(resolve(root, "docs/style.css")),
   "展示页文件不完整",
 );
 check(
-  "A27 展示页加载 playground.js",
-  appJs.includes("./playground.js") && indexHtml.includes("app.js"),
-  "app.js 未引用 playground.js",
+  "A27 展示页 / Jekyll 配置",
+  appJs.includes("./playground.js") &&
+    demoHtml.includes("app.js") &&
+    landing.includes("demo.html") &&
+    jekyllConfig.includes("theme: jekyll-theme-cayman"),
+  "展示页或 Jekyll 配置不完整",
 );
 check(
   "A28 Pages workflow 构建 playground",

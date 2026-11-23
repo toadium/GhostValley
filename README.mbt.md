@@ -2,7 +2,7 @@
 
 > 立项材料：[申报书](申报书.md) · [自查报告](自查报告.md) · [技术附件](docs/proposal_appendix.md) · [已知缺口](docs/known-gaps.md) · [模型卡](docs/MODEL_CARD.md) · [数据卡](docs/DATA_CARD.md)
 
-> 在线演示：<https://toadium.github.io/GhostValley/>（需 Settings → Pages 启用，推荐 main /docs）
+> 在线演示：<https://toadium.github.io/GhostValley/> · [交互 Demo](https://toadium.github.io/GhostValley/demo.html)（需 Settings → Pages 启用，推荐 main /docs）
 >
 > 决赛材料：[评分自证](docs/FINAL_SCORECARD.md) · [演示脚本](docs/DEMO_SCRIPT.md) · [竞品对照](docs/COMPETITIVE_MATRIX.md) · [技术攻关](docs/TECH_CHALLENGES.md) · [AI 证据](docs/AI_EVIDENCE.md)
 

@@ -1,14 +1,6 @@
 name: Pages
 
 on:
-  # 仓库需在 Settings → Pages 启用（推荐 main /docs：docs/playground.js 已入库，零构建）。
-  # 若选择 Actions 模式并希望 push 自动部署，取消下面 push 块注释。
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - "docs/**"
-  #     - "playground/**"
-  #     - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -40,12 +32,17 @@ jobs:
             "$HOME/.moon/bin/moon" update
       - name: Build playground (js)
         run: moon build --target js --release playground
-      - name: Assemble site
+      - name: Assemble Jekyll source
         run: |
-          mkdir -p _site
-          cp -r docs/. _site/
-          cp _build/js/release/build/playground/playground.js _site/playground.js
-          ls -la _site
+          mkdir -p site
+          cp -r docs/. site/
+          cp _build/js/release/build/playground/playground.js site/playground.js
+          ls -la site
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./site
+          destination: ./_site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

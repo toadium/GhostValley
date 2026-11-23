@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GhostValley · AI 心理压力演练（浏览器内演示）</title>
-  <meta name="description" content="GhostValley：AI 心理压力演练系统。困境 → Qwen 回放感悟 → 记忆/遗忘 → 评估 → 回放。页面内由 MoonBit 编译到 JavaScript，无后端、无网络请求。" />
+  <title>GhostValley · 交互 Demo</title>
+  <meta name="description" content="GhostValley 交互演示：Qwen 回放质量、训练报告、确定性回放；由 MoonBit 编译到 JavaScript，无后端。" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="hero">
-    <p class="eyebrow">MoonBit · 季度赛决赛演示</p>
+    <p class="eyebrow">MoonBit · 浏览器内演示</p>
     <h1>GhostValley</h1>
     <p class="tagline">AI 心理压力演练：在可控挫折中训练韧性</p>
     <p class="sub">
@@ -18,15 +18,15 @@
     </p>
     <div class="badges">
       <span id="version">0.4.0</span>
-      <span>503 × 4 后端测试</span>
-      <span>覆盖率 91.6%</span>
-      <span>变异 13 / 13 KILLED</span>
+      <span>521 × 4 后端测试</span>
+      <span>覆盖率 97.5%</span>
+      <span>变异 14 / 14 KILLED</span>
       <span>Qwen 精选 23 / 24</span>
     </div>
     <div class="links">
+      <a href="./">← 返回介绍</a>
       <a href="https://github.com/toadium/GhostValley">GitHub</a>
       <a href="https://mooncakes.io/docs/walkzzz/ghostvalley">mooncakes</a>
-      <a href="https://github.com/toadium/GhostValley/blob/main/申报书.md">申报书</a>
       <a href="https://github.com/toadium/GhostValley/blob/main/docs/FINAL_SCORECARD.md">评分自证</a>
       <a href="https://github.com/toadium/GhostValley/blob/main/docs/TEST_REPORT.md">测试报告</a>
     </div>
@@ -69,7 +69,7 @@
       <ul>
         <li>Qwen2.5-0.5B 只在离线生成语料；运行时确定性回放，四后端一致。</li>
         <li>质量层 + 严格模式：低质量/含安全词响应自动回退，不把 0.5B 输出当结论。</li>
-        <li>503×4 测试、覆盖率 91.6%、13 个变异点、文档一致性 36 项；全部命令可复现。</li>
+        <li>521×4 测试、覆盖率 97.5%、14 个变异点、文档一致性 49 项；全部命令可复现。</li>
         <li>模拟挫折强制 <code>is_simulation</code> 标记；训练协议限制压力/信心/冷却期。</li>
       </ul>
     </section>
