@@ -66,7 +66,7 @@ jobs:
         with:
           node-version: 22
       - name: Coverage gate
-        run: node scripts/check_coverage.mjs --min 95
+        run: node scripts/check_coverage.mjs --min 97
 
   pages:
     name: Pages demo

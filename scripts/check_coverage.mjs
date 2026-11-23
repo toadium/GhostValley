@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // 覆盖率门禁：运行 moon coverage analyze，统计根包源码（排除 examples/_build）。
-// 用法：node scripts/check_coverage.mjs [--min 95] [--from coverage.txt]
+// 用法：node scripts/check_coverage.mjs [--min 97] [--from coverage.txt]
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
 const minAt = args.indexOf("--min");
-const min = minAt >= 0 ? Number(args[minAt + 1]) : 95;
+const min = minAt >= 0 ? Number(args[minAt + 1]) : 97;
 const fromAt = args.indexOf("--from");
 
 function loadOutput() {

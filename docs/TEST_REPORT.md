@@ -2,8 +2,8 @@
 
 - 版本：**0.4.0**
 - 日期：2026-11-21
-- 测试：**518 / 518 × 4 后端**（native / wasm / wasm-gc / js）
-- 覆盖率：**95.8%**（1364 / 1424，核心库；排除 examples）
+- 测试：**521 / 521 × 4 后端**（native / wasm / wasm-gc / js）
+- 覆盖率：**97.5%**（1389 / 1424，核心库；排除 examples）
 - 变异测试：**14 / 14 KILLED**
 - 严格门禁：`moon check --target all --warn-list +73 --deny-warn` → 0 warning 0 error
 - 格式：`moon fmt --check` 通过
@@ -12,7 +12,7 @@
 
 | 类型 | 文件数 | 说明 |
 |---|---:|---|
-| 单元/黑盒测试 | 25 | 引擎、记忆、检索、衰减、训练、多智能体、课程、检查点、统计、情绪、协议、仪表盘 |
+| 单元/黑盒测试 | 29 | 引擎、记忆、检索、衰减、训练、多智能体、课程、检查点、统计、情绪、协议、仪表盘 |
 | 示例程序 | 4 | demo / onboarding / team_stress / customer_service |
 | 属性/模糊测试 | 3 | fuzz_property / boundary / invariant_property（100 组序列） |
 | Qwen 回放/质量 | 3 | qwen_adapter（9）+ qwen_quality（9）+ qwen_curated（5） |
@@ -25,9 +25,9 @@ moon coverage analyze -- -f summary
 node scripts/check_coverage.mjs --min 95
 ```
 
-- 核心库：1364 / 1424 = **95.8%**
+- 核心库：1389 / 1424 = **97.5%**
 - 最低文件：`ghost_valley.mbt`（92.5%）、`protocol.mbt`（93.1%）
-- 门槛：CI 要求 ≥ 95%；examples/cli/bench/playground 不计入。
+- 门槛：CI 要求 ≥ 97%；examples/cli/bench/playground 不计入。
 
 ## 变异测试
 

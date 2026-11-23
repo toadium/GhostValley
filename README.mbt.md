@@ -29,7 +29,7 @@
 - `QwenReplayLLM`：12 条基础语料 + 24 条精选语料（`new_curated`），编译进 `qwen_corpus.mbt` / `qwen_curated.mbt`，四后端确定性回放。
 - 评测：144 次真实推理（24 困境 × 3 温度 × 2 seed）；精选语料 23/24 达质量门槛，详见 [docs/QWEN_EVAL.md](docs/QWEN_EVAL.md)。
 - 重新生成语料：`python scripts/qwen_generate.py`、`python scripts/curate_qwen_corpus.py`（本地 GGUF + llama-cpp-python）。
-- 质量门禁：518 × 4 测试、覆盖率 95.8%（1364/1424）、变异 14/14、严格零警告。
+- 质量门禁：521 × 4 测试、覆盖率 97.5%（1389/1424）、变异 14/14、严格零警告。
 
 ## CLI 与基准
 
