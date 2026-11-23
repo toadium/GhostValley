@@ -161,6 +161,72 @@ check(
   readme.includes("integrations/mcp") && readme.includes("qwen_live.py"),
   "README 缺 MCP/实时入口",
 );
+const rootReadme = read("README.md");
+check(
+  "A34 根 README 存在且口径一致",
+  rootReadme.includes("521") &&
+    rootReadme.includes("97.5%") &&
+    rootReadme.includes("playground/README.md"),
+  "根 README 缺测试数/覆盖率/模块入口",
+);
+
+const packageReadmes = [
+  "playground",
+  "cli",
+  "bench",
+  "integrations/mcp",
+  "examples",
+  "examples/demo",
+  "examples/onboarding",
+  "examples/team_stress",
+  "examples/customer_service",
+  "examples/qwen_curated",
+];
+const missingReadmes = packageReadmes.filter(
+  (pkg) => !existsSync(resolve(root, `${pkg}/README.md`)),
+);
+check(
+  "A35 包 README 齐全",
+  missingReadmes.length === 0,
+  missingReadmes.join(", "),
+);
+
+const deadPackageLinks = [];
+for (const pkg of packageReadmes) {
+  const file = `${pkg}/README.md`;
+  const text = read(file);
+  for (const match of text.matchAll(/\]\(([^)]+)\)/g)) {
+    const target = match[1];
+    if (/^(https?:|#|mailto:)/.test(target)) continue;
+    const path = target.split("#")[0];
+    if (!path) continue;
+    if (!existsSync(resolve(root, pkg, path))) {
+      deadPackageLinks.push(`${file} -> ${target}`);
+    }
+  }
+}
+check(
+  "A36 包 README 无死链",
+  deadPackageLinks.length === 0,
+  deadPackageLinks.slice(0, 5).join("; "),
+);
+
+const rootDeadLinks = [];
+for (const match of rootReadme.matchAll(/\]\(([^)]+)\)/g)) {
+  const target = match[1];
+  if (/^(https?:|#|mailto:)/.test(target)) continue;
+  const path = target.split("#")[0];
+  if (!path) continue;
+  if (!existsSync(resolve(root, path))) {
+    rootDeadLinks.push(target);
+  }
+}
+check(
+  "A37 根 README 无死链",
+  rootDeadLinks.length === 0,
+  rootDeadLinks.slice(0, 5).join("; "),
+);
+
 check(
   "A31 README 含在线演示与决赛材料",
   readme.includes("toadium.github.io/GhostValley") &&

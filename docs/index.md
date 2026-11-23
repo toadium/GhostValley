@@ -55,6 +55,21 @@ moon run cli --target native -- help
 | `qwen_curated_quality_summary()` | 精选语料质量 |
 | `QwenReplayLLM::new_curated()` | Qwen 回放适配器 |
 
+## 模块文档
+
+| 模块 | 用途 | 文档 |
+|---|---|---|
+| `playground` | 浏览器演示导出层 | [README](https://github.com/toadium/GhostValley/blob/main/playground/README.md) |
+| `cli` | 命令行入口（6 命令） | [README](https://github.com/toadium/GhostValley/blob/main/cli/README.md) |
+| `bench` | 性能基准（9 组） | [README](https://github.com/toadium/GhostValley/blob/main/bench/README.md) |
+| `integrations/mcp` | MCP server（4 tools） | [README](https://github.com/toadium/GhostValley/blob/main/integrations/mcp/README.md) |
+| `examples` | 5 个示例总览 | [README](https://github.com/toadium/GhostValley/blob/main/examples/README.md) |
+| `examples/demo` | 完整工作流 | [README](https://github.com/toadium/GhostValley/blob/main/examples/demo/README.md) |
+| `examples/onboarding` | 新员工入职 | [README](https://github.com/toadium/GhostValley/blob/main/examples/onboarding/README.md) |
+| `examples/team_stress` | 技术团队压力 | [README](https://github.com/toadium/GhostValley/blob/main/examples/team_stress/README.md) |
+| `examples/customer_service` | 客服危机 | [README](https://github.com/toadium/GhostValley/blob/main/examples/customer_service/README.md) |
+| `examples/qwen_curated` | Qwen 精选回放 | [README](https://github.com/toadium/GhostValley/blob/main/examples/qwen_curated/README.md) |
+
 ## 质量证据
 
 - 测试：521 × 4 后端（native / wasm / wasm-gc / js）
@@ -62,7 +77,7 @@ moon run cli --target native -- help
 - 变异：14 / 14 KILLED
 - 严格检查：`--warn-list +73 --deny-warn` 0/0
 - Qwen：144 次真实推理；基础 9/12、精选 23/24 达质量门槛
-- 文档：47+ 项一致性检查；Pages 自检
+- 文档：53+ 项一致性检查；Pages 自检 28+ 项
 
 ## 文档
 

@@ -41,6 +41,29 @@ check(
 check("demo loads app.js / style.css", html.includes("app.js") && html.includes("style.css"));
 check("app.js imports playground.js", appJs.includes("./playground.js"));
 
+const moduleReadmes = [
+  "playground",
+  "cli",
+  "bench",
+  "integrations/mcp",
+  "examples",
+  "examples/demo",
+  "examples/onboarding",
+  "examples/team_stress",
+  "examples/customer_service",
+  "examples/qwen_curated",
+];
+check(
+  "landing links 10 module READMEs",
+  moduleReadmes.every((pkg) => landing.includes(`blob/main/${pkg}/README.md`)),
+  `${moduleReadmes.length} 个模块`,
+);
+const rootReadme = readFileSync(join(root, "README.md"), "utf8");
+check(
+  "root README decorated",
+  rootReadme.includes("521") && rootReadme.includes("97.5%"),
+);
+
 const build = spawnSync("moon", ["build", "--target", "js", "--release", "playground"], {
   cwd: root,
   encoding: "utf8",
