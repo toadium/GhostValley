@@ -2,8 +2,8 @@
 
 - 版本：**0.4.0**
 - 日期：2026-11-21
-- 测试：**505 / 503 × 4 后端**（native / wasm / wasm-gc / js）
-- 覆盖率：**91.6%**（1356 / 1480，核心库；排除 examples）
+- 测试：**518 / 518 × 4 后端**（native / wasm / wasm-gc / js）
+- 覆盖率：**95.8%**（1364 / 1424，核心库；排除 examples）
 - 变异测试：**14 / 14 KILLED**
 - 严格门禁：`moon check --target all --warn-list +73 --deny-warn` → 0 warning 0 error
 - 格式：`moon fmt --check` 通过
@@ -22,12 +22,12 @@
 
 ```bash
 moon coverage analyze -- -f summary
-node scripts/check_coverage.mjs --min 90
+node scripts/check_coverage.mjs --min 95
 ```
 
-- 核心库：1281 / 1399 = **91.6%**
-- 最低文件：`event_system.mbt`（75.0%）、`persistence.mbt`（84.7%）
-- 门槛：CI 要求 ≥ 90%；examples 不计入。
+- 核心库：1364 / 1424 = **95.8%**
+- 最低文件：`ghost_valley.mbt`（92.5%）、`protocol.mbt`（93.1%）
+- 门槛：CI 要求 ≥ 95%；examples/cli/bench/playground 不计入。
 
 ## 变异测试
 
@@ -75,7 +75,7 @@ node scripts/mutation_test.mjs
 ```bash
 moon check --target all --warn-list +73 --deny-warn
 moon test  --target all --warn-list +73 --deny-warn
-node scripts/check_coverage.mjs --min 90
+node scripts/check_coverage.mjs --min 95
 node scripts/mutation_test.mjs
 node scripts/check_docs.mjs
 ```

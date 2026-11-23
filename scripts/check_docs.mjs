@@ -32,12 +32,12 @@ check(
 check("A2 申报书版本 = moon.mod", proposal.includes(`v${version}`), `申报书未写 v${version}`);
 check("A3 自查报告版本 = moon.mod", selfCheck.includes(`v${version}`), `自查报告未写 v${version}`);
 
-check("A4 README 测试数 505", readme.includes("505"), "README 未写 505");
-check("A5 申报书测试数 505", proposal.includes("505"), "申报书未写 505");
-check("A6 自查报告测试数 505", selfCheck.includes("505"), "自查报告未写 505");
-check("A7 测试报告测试数 505", testReport.includes("505"), "TEST_REPORT 未写 505");
+check("A4 README 测试数 518", readme.includes("518"), "README 未写 518");
+check("A5 申报书测试数 518", proposal.includes("518"), "申报书未写 518");
+check("A6 自查报告测试数 518", selfCheck.includes("518"), "自查报告未写 518");
+check("A7 测试报告测试数 518", testReport.includes("518"), "TEST_REPORT 未写 518");
 
-check("A8 覆盖率 ≥ 90% 记录", testReport.includes("91.6%") && testReport.includes("1356"), "TEST_REPORT 缺覆盖率");
+check("A8 覆盖率 ≥ 95% 记录", testReport.includes("95.8%") && testReport.includes("1364"), "TEST_REPORT 缺覆盖率");
 check("A9 变异 14/14 记录", testReport.includes("14 / 14 KILLED") || testReport.includes("14/14 KILLED"), "TEST_REPORT 缺变异");
 
 check("A10 Qwen 评测文档存在", existsSync(resolve(root, "docs/QWEN_EVAL.md")) && qwenEval.includes("Qwen2.5-0.5B"), "缺少 QWEN_EVAL.md");
