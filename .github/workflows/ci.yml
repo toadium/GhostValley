@@ -94,3 +94,15 @@ jobs:
           version: latest
       - name: Run benchmark
         run: moon run bench --target native --release
+
+  mcp:
+    name: MCP smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit
+        uses: hustcer/setup-moonbit@v1
+        with:
+          version: latest
+      - name: MCP check
+        run: python scripts/check_mcp.py

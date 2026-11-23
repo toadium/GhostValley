@@ -7,6 +7,7 @@
   0.4.0 为季度赛提交版本。
 - 功能内容与 1.15.0 相同：Qwen 精选回放/质量层、521×4 测试、覆盖率 97.5%、变异 14/14。
 - 新增 CLI（6 命令）、benchmark（9 组）、属性测试（100 组操作序列）。
+- 新增 MCP server（integrations/mcp，moonbitstack/moonmcp，4 tools）与本地 Qwen 实时脚本（scripts/qwen_live.py）。
 
 ## [1.15.0] - 2026-11-21
 

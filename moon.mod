@@ -15,3 +15,8 @@ description = "幽灵谷工程 - AI心理压力演练系统，基于 MoonBit 构
 options(
   preferred_target: "native",
 )
+
+import {
+  "moonbitstack/moonmcp@0.2.2",
+  "moonbitlang/async@0.22.5",
+}

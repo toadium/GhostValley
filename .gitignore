@@ -4,6 +4,8 @@ _build/
 # Temporary verification artifacts
 .tmp/
 coverage.txt
+.qwen_live.out
+.mooncakes/
 
 # IDE
 .vscode/

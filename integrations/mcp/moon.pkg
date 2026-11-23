@@ -1,0 +1,9 @@
+import {
+  "walkzzz/ghostvalley",
+  "moonbitstack/moonmcp",
+  "moonbitlang/async",
+}
+
+pkgtype(kind: "executable")
+
+supported_targets = "native"

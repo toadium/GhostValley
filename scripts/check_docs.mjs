@@ -142,6 +142,19 @@ check(
   "缺少 CLI/bench/属性测试",
 );
 check(
+  "A32 MCP 集成存在",
+  existsSync(resolve(root, "integrations/mcp/main.mbt")) &&
+    existsSync(resolve(root, "integrations/mcp/moon.pkg")) &&
+    existsSync(resolve(root, "scripts/check_mcp.py")) &&
+    existsSync(resolve(root, "scripts/qwen_live.py")),
+  "缺少 integrations/mcp 或脚本",
+);
+check(
+  "A33 README 含 MCP / 实时入口",
+  readme.includes("integrations/mcp") && readme.includes("qwen_live.py"),
+  "README 缺 MCP/实时入口",
+);
+check(
   "A31 README 含在线演示与决赛材料",
   readme.includes("toadium.github.io/GhostValley") &&
     readme.includes("FINAL_SCORECARD.md"),

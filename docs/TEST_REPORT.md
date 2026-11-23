@@ -17,6 +17,7 @@
 | 属性/模糊测试 | 3 | fuzz_property / boundary / invariant_property（100 组序列） |
 | Qwen 回放/质量 | 3 | qwen_adapter（9）+ qwen_quality（9）+ qwen_curated（5） |
 | CLI / bench | 2 | 6 命令 + 9 组基准（native） |
+| MCP / 实时 | 2 | integrations/mcp（moonmcp, 4 tools）+ qwen_live.py |
 
 ## 覆盖率
 

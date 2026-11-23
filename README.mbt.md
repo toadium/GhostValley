@@ -41,6 +41,17 @@ moon run bench --target native --release
 
 CLI 为真实 argv 入口（`@env.args()`），bench 覆盖引擎/记忆/检索/衰减/序列化/Qwen 回放/训练管道。
 
+## MCP server 与实时模型
+
+```bash
+moon run integrations/mcp --target native   # MCP stdio（moonbitstack/moonmcp）
+python scripts/check_mcp.py                 # 握手/工具自检（7 项）
+python scripts/qwen_live.py "你的工具突然不可用"  # 本地 Qwen2.5-0.5B 实时推理
+```
+
+MCP 工具：`version` / `quality` / `eval` / `run_round`（Qwen 精选回放）。
+实时 Qwen 走 Python + llama-cpp-python；MoonBit MCP 内嵌进程在 Windows async process 下暂不可用（见 `docs/known-gaps.md`）。
+
 ## 快速开始
 
 ### 环境要求
