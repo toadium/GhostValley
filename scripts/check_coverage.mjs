@@ -37,6 +37,7 @@ for (const match of output.matchAll(pattern)) {
   const file = match[1].replace(/\\/g, "/");
   if (file.includes("/_build/") || file.startsWith("_build/")) continue;
   if (file.includes("/examples/") || file.startsWith("examples/")) continue;
+  if (file.includes("/playground/") || file.startsWith("playground/")) continue;
   rows.push({ file, covered: Number(match[2]), total: Number(match[3]) });
 }
 
